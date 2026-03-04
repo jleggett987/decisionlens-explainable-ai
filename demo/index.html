@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DecisionLens – Explainable Decision Walkthrough</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: #f6f7f9; color: #111; }
+    header { background: #fff; border-bottom: 1px solid #e6e8ee; padding: 18px 20px; position: sticky; top: 0; z-index: 5; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 18px 20px; }
+    h1 { font-size: 18px; margin: 0 0 6px; }
+    .sub { font-size: 13px; color: #444; margin: 0; }
+    .bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    select { padding: 8px 10px; border: 1px solid #cfd6e4; border-radius: 10px; background: #fff; }
+    .pill { font-size: 12px; padding: 6px 10px; border-radius: 999px; background: #eef2ff; color: #2b3a8a; border: 1px solid #d9e0ff; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 960px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
+    .card { background: #fff; border: 1px solid #e6e8ee; border-radius: 16px; padding: 14px 14px; box-shadow: 0 1px 0 rgba(0,0,0,0.03); }
+    .card h2 { font-size: 13px; margin: 0 0 10px; color: #333; letter-spacing: 0.02em; text-transform: uppercase; }
+    .muted { color: #555; font-size: 13px; line-height: 1.45; }
+    .kvs { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 0; }
+    .kv { font-size: 12px; padding: 6px 10px; border: 1px solid #e6e8ee; border-radius: 12px; background: #fbfbfd; }
+    .list { margin: 0; padding-left: 16px; }
+    .list li { margin: 6px 0; font-size: 13px; color: #222; line-height: 1.35; }
+    .opt { border: 1px solid #e6e8ee; border-radius: 14px; padding: 10px 10px; margin: 10px 0; background: #fbfbfd; }
+    .opt .top { display:flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .opt b { font-size: 14px; }
+    .badge { font-size: 11px; padding: 4px 8px; border-radius: 999px; border: 1px solid #e6e8ee; background: #fff; color: #444; white-space: nowrap; }
+    .rec { border: 1px solid #cfe3d2; background: #f2fbf3; }
+    .recTitle { display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+    .recTitle strong { font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { border-bottom: 1px solid #eef0f5; padding: 8px 6px; text-align: left; }
+    th { color: #333; font-weight: 600; }
+    footer { padding: 20px; color: #666; font-size: 12px; text-align:center; }
+    .small { font-size: 12px; color:#555; }
+
+    .btn {
+    padding: 8px 10px;
+    border: 1px solid #cfd6e4;
+    background: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    }
+    .btn:active { transform: translateY(1px); }
+    .toast {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+    }
+    .toast.show { opacity: 0.92; }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <h1>DecisionLens – Explainable Decision Walkthrough</h1>
+      <p class="sub">Read-only demo for product conversations: options, constraints, tradeoffs, and a defensible recommendation.</p>
+      <div class="bar">
+        <label class="small" for="scenarioSelect"><b>Scenario</b></label>
+        <select id="scenarioSelect"></select>
+        <span class="pill" id="stepPill">Step 1 of 5</span>
+        <span class="pill" id="domainPill">Domain</span>
+        <span class="pill" id="stakePill">Stake</span>
+        <button class="btn" id="homeBtn" type="button">Home</button>
+        <button class="btn" id="copySummaryBtn" type="button">Copy summary</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- HOME VIEW -->
+    <section class="card" id="viewHome" data-view style="display:none; margin-bottom:14px">
+      <h2>Welcome</h2>
+      <p class="muted">
+        DecisionLens is a read-only decision walkthrough. Pick a scenario to view options, constraints, uncertainty,
+        human impact, and a defensible recommendation.
+      </p>
+
+      <div class="opt">
+        <div class="top">
+          <b>Scenarios</b>
+          <span class="badge" id="scenarioCount">0</span>
+        </div>
+        <div id="scenarioCards"></div>
+      </div>
+
+      <div id="homeFlow"></div>
+
+    </section>
+
+    <!-- WALKTHROUGH VIEW -->
+    <section id="viewWalkthrough" data-view style="display:none;">
+      <section class="card" style="margin-bottom:14px">
+        <h2>Workflow</h2>
+        <div id="stepper" class="kvs"></div>
+        <p class="muted" id="stepCopy" style="margin:10px 0 0"></p>
+        <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn" id="backStepBtn" type="button">Back</button>
+          <button class="btn" id="nextStepBtn" type="button">Continue</button>
+        </div>
+      </section>
+
+      <section class="card" style="margin-bottom:14px">
+        <h2>What DecisionLens is / is not</h2>
+        <div class="grid" style="grid-template-columns: 1fr; gap: 10px;">
+          <div class="opt">
+            <div class="top"><b>DecisionLens <u>is</u></b></div>
+            <ul class="list" style="margin-top:8px">
+              <li>A decision reasoning walkthrough that makes tradeoffs explicit</li>
+              <li>An explainable recommendation with constraints, impacts, and uncertainty</li>
+            </ul>
+          </div>
+          <div class="opt">
+            <div class="top"><b>DecisionLens <u>is not</u></b></div>
+            <ul class="list" style="margin-top:8px">
+              <li>An autonomous decision-maker or “black box” optimizer</li>
+              <li>A legal compliance engine or a replacement for accountability</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card" data-pane="prompt">
+          <h2>Decision prompt</h2>
+          <p class="muted" id="prompt"></p>
+        </section>
+
+        <aside class="card rec" id="recCard" data-pane="recommendation">
+          <div class="recTitle">
+            <strong id="recTitle">Recommendation</strong>
+            <span class="badge" id="confidenceBadge">Confidence</span>
+          </div>
+          <div class="kvs">
+            <span class="kv" id="primaryReason"></span>
+            <span class="kv" id="keyTradeoff"></span>
+          </div>
+          <div class="small" id="selectedVsRecommended" style="margin-top:8px"></div>
+          <div style="margin-top:10px">
+            <div class="small"><b>Constraint check</b></div>
+            <ul class="list" id="constraintCheck"></ul>
+          </div>
+        </aside>
+
+        <section class="card" data-pane="options">
+          <h2>Options</h2>
+          <div id="options"></div>
+        </section>
+
+        <section class="card" data-pane="values">
+          <h2>Values & priorities</h2>
+          <div id="values"></div>
+        </section>
+
+        <section class="card" data-pane="constraints">
+          <h2>Constraints</h2>
+          <ul class="list" id="constraints"></ul>
+        </section>
+
+        <section class="card" data-pane="evidence">
+          <h2>Evidence & signals</h2>
+          <ul class="list" id="evidence"></ul>
+        </section>
+
+        <section class="card" data-pane="uncertainty">
+          <h2>Uncertainty</h2>
+          <div class="kvs" id="uncertaintyBadges"></div>
+          <div style="margin-top:10px" class="small"><b>Unknowns</b></div>
+          <ul class="list" id="unknowns"></ul>
+          <div style="margin-top:10px" class="small"><b>Risk of error</b></div>
+          <ul class="list" id="riskOfError"></ul>
+        </section>
+
+        <section class="card" data-pane="impact">
+          <h2>Impact by option</h2>
+          <div id="impact"></div>
+        </section>
+
+        <section class="card" data-pane="score">
+          <h2>Score breakdown</h2>
+          <table>
+            <thead id="scoreHead"></thead>
+            <tbody id="scoreTable"></tbody>
+          </table>
+        </section>
+
+        <section class="card" data-pane="explanation">
+          <h2>Explanation</h2>
+          <p class="muted" id="explanation"></p>
+          <div style="margin-top:10px" class="small"><b>Safeguards & next actions</b></div>
+          <ul class="list" id="safeguards"></ul>
+        </section>
+</div>
+
+    </section>
+
+    <div class="toast" id="toast">Copied summary</div>
+  </main>
+
+
+  <footer>
+    DecisionLens is a decision reasoning demo: explainability, constraints, tradeoffs, and human impact — not automation.
+  </footer>
+
+  <script src="scenarios.js"></script>
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>
