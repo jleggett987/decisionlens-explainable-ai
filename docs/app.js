@@ -37,7 +37,6 @@ const WORKFLOW = [
 
 let workflowStep = 0; // 0..4
 
-
 // Lightweight UI state for Home (progressive disclosure)
 const homeState = {
   scenarioId: null,
@@ -45,6 +44,12 @@ const homeState = {
 };
 
 let currentScenario = null;
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
 
 function buildCopySummary(sc, forcedOptionId = null) {
   const rec = sc.recommendation;
@@ -303,10 +308,19 @@ function renderWalkthrough(scenarioId, startStep = 1) {
   sel.onchange = () => goTo(`#/scenario/${sel.value}/step/${startStep}`);
 
   renderScenario(sc);
+  renderScoreBars(sc); // ✅ add this line
+
+  // Optional: make the badge feel more “AI”
+  const recRow = (sc.recommendation?.scoreTable || []).find(r => r.optionId === sc.recommendation?.recommendedOptionId);
+  const overall = recRow?.overall;
+  const badge = $("confidenceBadge");
+  if (badge) {
+    badge.textContent = `Confidence: ${sc.recommendation?.confidence || "—"}${overall != null ? ` • Score ${overall}` : ""}`;
+  }
 
   // IMPORTANT: initialize workflow step after scenario is rendered
   if (typeof setWorkflowStep === "function") {
-    setWorkflowStep(startStep - 1); // convert 1..5 => 0..4
+    setWorkflowStep(startStep - 1);
   }
 }
 
@@ -419,6 +433,37 @@ function renderStepper() {
   nextBtn.onclick = () => setWorkflowStep(workflowStep + 1);
 
   nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Review full decision" : "Continue";
+}
+
+function renderScoreBars(sc) {
+  const el = document.getElementById("scoreBars");
+  if (!el) return;
+
+  const rec = sc.recommendation || {};
+  const rows = Array.isArray(rec.scoreTable) ? [...rec.scoreTable] : [];
+  if (!rows.length) { el.innerHTML = ""; return; }
+
+  // Sort by overall descending
+  rows.sort((a, b) => (b.overall ?? 0) - (a.overall ?? 0));
+  const max = Math.max(...rows.map(r => r.overall ?? 0), 1);
+
+  const optionName = (id) => (sc.options || []).find(o => o.id === id)?.name || `Option ${id}`;
+
+  el.innerHTML = rows.map(r => {
+    const pct = Math.round(((r.overall ?? 0) / max) * 100);
+    const isRec = r.optionId === rec.recommendedOptionId;
+    return `
+      <div style="margin:10px 0">
+        <div style="display:flex; justify-content:space-between; gap:10px; align-items:baseline;">
+          <div><b>${r.optionId}</b> — ${escapeHtml(optionName(r.optionId))} ${isRec ? `<span class="badge">Recommended</span>` : ``}</div>
+          <div><b>${r.overall ?? "—"}</b></div>
+        </div>
+        <div style="height:10px; border-radius:999px; overflow:hidden; background: rgba(0,0,0,0.08); margin-top:6px">
+          <div style="height:100%; width:${pct}%; background: rgba(120,150,255,0.85)"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function boot() {
