@@ -96,6 +96,69 @@ Balances fraud prevention with user access fairness in real-time decision system
 
 These scenarios demonstrate how DecisionLens analyzes complex tradeoffs and produces explainable recommendations.
 
+Explainability Report Output
+
+DecisionLens produces a structured reasoning report explaining how a recommendation was derived.
+
+Example report output:
+
+Decision Scenario: Fraud Detection Access Control
+
+Options Evaluated
+────────────────────────
+
+A: Approve Request
+B: Deny Request
+C: Approve with Safeguards
+
+
+Scoring Results
+────────────────────────
+
+Option A
+Fraud Prevention: 40
+Fairness: 85
+Trust: 70
+Efficiency: 90
+Overall Score: 67
+
+
+Option B
+Fraud Prevention: 85
+Fairness: 30
+Trust: 45
+Efficiency: 80
+Overall Score: 61
+
+
+Option C
+Fraud Prevention: 70
+Fairness: 75
+Trust: 75
+Efficiency: 65
+Overall Score: 72
+
+
+Recommendation
+────────────────────────
+
+Recommended Option: C
+Confidence: Medium
+
+Primary Reason
+Balances fraud prevention with fairness under uncertainty.
+
+Key Tradeoff
+Accepts operational cost to reduce the risk of unjust denial.
+
+
+Safeguards
+────────────────────────
+
+• Trigger manual review for flagged cases  
+• Monitor post-approval behavior  
+• Collect additional signals to reduce uncertainty  
+• Re-evaluate thresholds if false positives increase
 System Architecture
 
 DecisionLens follows a structured reasoning pipeline:
@@ -170,3 +233,4 @@ As AI systems increasingly influence high-stakes decisions, tools like DecisionL
 License
 
 MIT License
+
