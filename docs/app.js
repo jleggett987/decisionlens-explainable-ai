@@ -1,8 +1,13 @@
 // app.js
 import { getRoute, goTo, onRouteChange } from "./router.js";
 import { showView } from "./views.js";
-import { renderScenario } from "./render.js";
+import {
+  renderScenario,
+  hideAIAnalysisCard,
+  renderAIAnalysisCard
+} from "./render.js";
 import { copyToClipboard, showToast } from "./clipboard.js";
+import { toggleAI, processScenario, updateAIStatus } from "./ai-service.js";
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
@@ -31,30 +36,50 @@ const WORKFLOW = [
   {
     name: "Decide & safeguard",
     copy: "Present a defensible recommendation with accountability and next actions.",
-    panes: ["prompt", "options", "values", "constraints", "evidence", "uncertainty", "impact", "recommendation", "score", "explanation"]
+    panes: [
+      "prompt",
+      "options",
+      "values",
+      "constraints",
+      "evidence",
+      "uncertainty",
+      "impact",
+      "recommendation",
+      "score",
+      "explanation"
+    ]
   }
 ];
 
-let workflowStep = 0; // 0..4
+let workflowStep = 0;
+let currentScenario = null;
+let workflowUIWired = false;
 
-// Lightweight UI state for Home (progressive disclosure)
 const homeState = {
   scenarioId: null,
   optionId: null
 };
 
-let currentScenario = null;
-
 function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
   }[c]));
 }
 
+function shortPrompt(p) {
+  const s = String(p || "").trim();
+  if (s.length <= 220) return s;
+  return `${s.slice(0, 220).trim()}…`;
+}
+
 function buildCopySummary(sc, forcedOptionId = null) {
-  const rec = sc.recommendation;
+  const rec = sc.recommendation || {};
   const useOptionId = forcedOptionId || rec.recommendedOptionId;
-  const option = sc.options.find(o => o.id === useOptionId);
+  const option = (sc.options || []).find((o) => o.id === useOptionId);
 
   const lines = [];
   lines.push(`DecisionLens – ${sc.title}`);
@@ -70,28 +95,22 @@ function buildCopySummary(sc, forcedOptionId = null) {
   lines.push("");
 
   lines.push("Recommendation (system)");
-  lines.push(`- Recommended: Option ${rec.recommendedOptionId}`);
-  lines.push(`- Confidence: ${rec.confidence}`);
-  lines.push(`- Primary reason: ${rec.primaryReason}`);
-  lines.push(`- Key tradeoff: ${rec.keyTradeoff}`);
+  lines.push(`- Recommended: Option ${rec.recommendedOptionId || "—"}`);
+  lines.push(`- Confidence: ${rec.confidence || "—"}`);
+  lines.push(`- Primary reason: ${rec.primaryReason || "—"}`);
+  lines.push(`- Key tradeoff: ${rec.keyTradeoff || "—"}`);
   lines.push("");
 
   lines.push("Explanation");
-  lines.push(rec.explanation);
+  lines.push(rec.explanation || "—");
 
   return lines.join("\n");
 }
 
-function shortPrompt(p) {
-  const s = String(p || "").trim();
-  if (s.length <= 220) return s;
-  return s.slice(0, 220).trim() + "…";
-}
-
 function setHomeScenario(id) {
   homeState.scenarioId = id;
-  homeState.optionId = null; // reset downstream selection
-  renderHome(); // re-render Home with next step unlocked
+  homeState.optionId = null;
+  renderHome();
 }
 
 function setHomeOption(id) {
@@ -113,46 +132,56 @@ function clearHomeScenario() {
 function renderHome() {
   showView("viewHome");
 
-  // Header behavior on Home
   const sel = $("scenarioSelect");
-  sel.innerHTML = `<option value="">(Open a scenario)</option>`;
-  sel.value = "";
-  sel.disabled = true;
+  if (sel) {
+    sel.innerHTML = `<option value="">(Open a scenario)</option>`;
+    sel.value = "";
+    sel.disabled = true;
+  }
 
-  $("domainPill").textContent = "Domain";
-  $("stakePill").textContent = "Stake";
-  currentScenario = null; // Home isn't a scenario view
+  const stepPill = $("stepPill");
+  if (stepPill) stepPill.textContent = "Step 1 of 5";
+
+  const domainPill = $("domainPill");
+  if (domainPill) domainPill.textContent = "Domain";
+
+  const stakePill = $("stakePill");
+  if (stakePill) stakePill.textContent = "Stake";
+
+  currentScenario = null;
+  hideAIAnalysisCard?.();
 
   $("scenarioCount").textContent = `${scenarios.length}`;
 
-  // Scenario cards
-  $("scenarioCards").innerHTML = scenarios.map(s => `
+  $("scenarioCards").innerHTML = scenarios.map((s) => `
     <div class="opt" style="margin:10px 0;">
       <div class="top">
-        <b>${s.title}</b>
-        <span class="badge">${s.domain} • ${s.stakeLevel}</span>
+        <b>${escapeHtml(s.title)}</b>
+        <span class="badge">${escapeHtml(s.domain)} • ${escapeHtml(s.stakeLevel)}</span>
       </div>
-      <div class="muted" style="margin-top:6px">${shortPrompt(s.prompt)}</div>
+      <div class="muted" style="margin-top:6px">${escapeHtml(shortPrompt(s.prompt))}</div>
       <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn" type="button" data-select="${s.id}">
+        <button class="btn" type="button" data-select="${escapeHtml(s.id)}">
           ${homeState.scenarioId === s.id ? "Selected" : "Select scenario"}
         </button>
-        <button class="btn" type="button" data-start="${s.id}" data-step="1">Start workflow</button>
-        <button class="btn" type="button" data-open="${s.id}">Open full walkthrough</button>
+        <button class="btn" type="button" data-start="${escapeHtml(s.id)}" data-step="1">
+          Start workflow
+        </button>
+        <button class="btn" type="button" data-open="${escapeHtml(s.id)}">
+          Open full walkthrough
+        </button>
       </div>
     </div>
   `).join("");
 
-  // Open full walkthrough (Step 5)
-  $("scenarioCards").querySelectorAll("[data-open]").forEach(btn => {
+  $("scenarioCards").querySelectorAll("[data-open]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-open");
       goTo(`#/scenario/${id}/step/5`);
     });
   });
 
-  // Start workflow at Step 1
-  $("scenarioCards").querySelectorAll("[data-start]").forEach(btn => {
+  $("scenarioCards").querySelectorAll("[data-start]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-start");
       const step = btn.getAttribute("data-step") || "1";
@@ -160,17 +189,15 @@ function renderHome() {
     });
   });
 
-  // Select scenario for progressive Home flow
-  $("scenarioCards").querySelectorAll("[data-select]").forEach(btn => {
-    btn.addEventListener("click", () => setHomeScenario(btn.getAttribute("data-select")));
+  $("scenarioCards").querySelectorAll("[data-select]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setHomeScenario(btn.getAttribute("data-select"));
+    });
   });
 
-
-  // Progressive disclosure area
   const flow = $("homeFlow");
-  const selectedScenario = scenarios.find(s => s.id === homeState.scenarioId);
+  const selectedScenario = scenarios.find((s) => s.id === homeState.scenarioId);
 
-  // Step 0: nothing selected
   if (!selectedScenario) {
     flow.innerHTML = `
       <section class="card" style="margin-top:14px">
@@ -185,10 +212,9 @@ function renderHome() {
     return;
   }
 
-  // Step 1: scenario selected -> show option picker
-  const optionChips = selectedScenario.options.map(o => `
-    <button class="btn" type="button" data-pickopt="${o.id}">
-      Option ${o.id}: ${o.name}${homeState.optionId === o.id ? " ✓" : ""}
+  const optionChips = (selectedScenario.options || []).map((o) => `
+    <button class="btn" type="button" data-pickopt="${escapeHtml(o.id)}">
+      Option ${escapeHtml(o.id)}: ${escapeHtml(o.name)}${homeState.optionId === o.id ? " ✓" : ""}
     </button>
   `).join("");
 
@@ -197,10 +223,10 @@ function renderHome() {
       <h2>Selected scenario</h2>
       <div class="opt" style="margin:0;">
         <div class="top">
-          <b>${selectedScenario.title}</b>
-          <span class="badge">${selectedScenario.domain} • ${selectedScenario.stakeLevel}</span>
+          <b>${escapeHtml(selectedScenario.title)}</b>
+          <span class="badge">${escapeHtml(selectedScenario.domain)} • ${escapeHtml(selectedScenario.stakeLevel)}</span>
         </div>
-        <div class="muted" style="margin-top:6px">${selectedScenario.prompt}</div>
+        <div class="muted" style="margin-top:6px">${escapeHtml(selectedScenario.prompt)}</div>
         <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
           <button class="btn" type="button" id="clearScenarioBtn">Clear scenario</button>
           <button class="btn" type="button" id="openWalkthroughBtn">Open walkthrough</button>
@@ -221,35 +247,40 @@ function renderHome() {
   `;
 
   $("clearScenarioBtn").addEventListener("click", clearHomeScenario);
-  $("openWalkthroughBtn").addEventListener("click", () => goTo(`#/scenario/${selectedScenario.id}/step/1`));
-  flow.querySelectorAll("[data-pickopt]").forEach(btn => {
-    btn.addEventListener("click", () => setHomeOption(btn.getAttribute("data-pickopt")));
+  $("openWalkthroughBtn").addEventListener("click", () => {
+    goTo(`#/scenario/${selectedScenario.id}/step/1`);
   });
+
+  flow.querySelectorAll("[data-pickopt]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setHomeOption(btn.getAttribute("data-pickopt"));
+    });
+  });
+
   if (homeState.optionId) {
     $("clearOptionBtn").addEventListener("click", clearHomeOption);
   }
 
-  // Step 2: option selected -> reveal preview cards + actions
   if (homeState.optionId) {
-    const opt = selectedScenario.options.find(o => o.id === homeState.optionId);
-    const impact = (selectedScenario.impact || []).find(i => i.optionId === homeState.optionId);
-
+    const opt = (selectedScenario.options || []).find((o) => o.id === homeState.optionId);
+    const impact = (selectedScenario.impact || []).find((i) => i.optionId === homeState.optionId);
     const unlocked = $("homeUnlocked");
+
     unlocked.innerHTML = `
       <section class="card" style="margin-top:14px">
         <h2>Preview</h2>
         <div class="opt" style="margin:0;">
           <div class="top">
-            <b>Option ${opt.id}: ${opt.name}</b>
-            <span class="badge">${opt.reversibility} • ${opt.timeHorizon}</span>
+            <b>Option ${escapeHtml(opt?.id || "—")}: ${escapeHtml(opt?.name || "—")}</b>
+            <span class="badge">${escapeHtml(opt?.reversibility || "—")} • ${escapeHtml(opt?.timeHorizon || "—")}</span>
           </div>
-          <div class="muted" style="margin-top:6px">${opt.description}</div>
+          <div class="muted" style="margin-top:6px">${escapeHtml(opt?.description || "—")}</div>
 
           ${impact ? `
             <div style="margin-top:10px" class="small"><b>Human impact</b></div>
-            <div class="muted">${impact.humanImpact}</div>
+            <div class="muted">${escapeHtml(impact.humanImpact)}</div>
             <div style="margin-top:8px" class="small"><b>Harm types</b></div>
-            <div class="kvs">${impact.harmTypes.map(h => `<span class="kv">${h}</span>`).join("")}</div>
+            <div class="kvs">${(impact.harmTypes || []).map((h) => `<span class="kv">${escapeHtml(h)}</span>`).join("")}</div>
           ` : ``}
         </div>
       </section>
@@ -283,60 +314,51 @@ function renderHome() {
       }
     });
 
-    $("openFullBtn").addEventListener("click", () => goTo(`#/scenario/${selectedScenario.id}/step/5`));
-
+    $("openFullBtn").addEventListener("click", () => {
+      goTo(`#/scenario/${selectedScenario.id}/step/5`);
+    });
   }
 }
 
 function renderWalkthrough(scenarioId, startStep = 1) {
   showView("viewWalkthrough");
+  wireWorkflowUI();
 
-  // If you implemented wireWorkflowUI (recommended), call it here
-  if (typeof wireWorkflowUI === "function") wireWorkflowUI();
-
-  const sc = scenarios.find(s => s.id === scenarioId) || scenarios[0];
+  const sc = scenarios.find((s) => s.id === scenarioId) || scenarios[0];
   if (!sc) return;
 
   currentScenario = sc;
 
   const sel = $("scenarioSelect");
   sel.disabled = false;
-  sel.innerHTML = scenarios.map(s => `<option value="${s.id}">${s.title}</option>`).join("");
+  sel.innerHTML = scenarios.map((s) => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.title)}</option>`).join("");
   sel.value = sc.id;
-
-  // keep the current step when switching scenarios from dropdown
   sel.onchange = () => goTo(`#/scenario/${sel.value}/step/${startStep}`);
 
   renderScenario(sc);
-  renderScoreBars(sc); // ✅ add this line
+  renderScoreBars(sc);
 
-  // Optional: make the badge feel more “AI”
-  const recRow = (sc.recommendation?.scoreTable || []).find(r => r.optionId === sc.recommendation?.recommendedOptionId);
+  const recRow = (sc.recommendation?.scoreTable || []).find(
+    (r) => r.optionId === sc.recommendation?.recommendedOptionId
+  );
   const overall = recRow?.overall;
   const badge = $("confidenceBadge");
   if (badge) {
     badge.textContent = `Confidence: ${sc.recommendation?.confidence || "—"}${overall != null ? ` • Score ${overall}` : ""}`;
   }
 
-  // IMPORTANT: initialize workflow step after scenario is rendered
   if (typeof setWorkflowStep === "function") {
     setWorkflowStep(startStep - 1);
   }
 }
 
-
-
 function handleRoute() {
   const r = getRoute();
 
-  // Supports:
-  // #/home
-  // #/scenario/<scenarioId>
-  // #/scenario/<scenarioId>/step/<n>
   if (r.path === "scenario" && r.rest[0]) {
     const scenarioId = r.rest[0];
 
-    let step = 1; // default Step 1
+    let step = 1;
     const stepIdx = r.rest.indexOf("step");
     if (stepIdx !== -1 && r.rest[stepIdx + 1]) {
       const parsed = parseInt(r.rest[stepIdx + 1], 10);
@@ -350,11 +372,11 @@ function handleRoute() {
   renderHome();
 }
 
-
-
 function wireHeaderButtons() {
   const homeBtn = $("homeBtn");
-  if (homeBtn) homeBtn.addEventListener("click", () => goTo("#/home"));
+  if (homeBtn) {
+    homeBtn.addEventListener("click", () => goTo("#/home"));
+  }
 
   const copyBtn = $("copySummaryBtn");
   if (copyBtn) {
@@ -371,38 +393,72 @@ function wireHeaderButtons() {
       }
     });
   }
+
+  const aiToggleBtn = $("aiToggleBtn");
+  if (aiToggleBtn) {
+    aiToggleBtn.addEventListener("click", async () => {
+      const state = toggleAI();
+
+      aiToggleBtn.textContent = state.isEnabled ? "AI: On" : "AI: Off";
+      aiToggleBtn.classList.toggle("ai-active", state.isEnabled);
+
+      const aiStatus = $("aiStatus");
+      if (aiStatus) {
+        aiStatus.textContent = state.isEnabled ? "AI Enabled" : "AI Off";
+        aiStatus.className = state.isEnabled ? "pill ai-enabled" : "pill";
+      }
+
+      showToast(state.isEnabled ? "AI features enabled" : "AI features disabled");
+
+      if (state.isEnabled && currentScenario) {
+        try {
+          const aiResult = await processScenario(currentScenario);
+          console.log("AI Analysis complete:", aiResult.aiRecommendation);
+          renderAIAnalysisCard(aiResult.aiRecommendation, aiResult.aiAnalysis, currentScenario);
+          showToast("AI analysis complete");
+        } catch (err) {
+          console.error("AI processing error:", err);
+          hideAIAnalysisCard();
+          showToast("AI processing failed");
+        }
+      } else {
+        hideAIAnalysisCard();
+      }
+    });
+  }
 }
 
 function setWorkflowStep(n) {
-  // 1) Clamp the step
   workflowStep = Math.max(0, Math.min(WORKFLOW.length - 1, n));
 
-  // 2) 🔹 NEW: reflect step in the URL
   const r = getRoute();
   if (r.path === "scenario" && r.rest[0]) {
     const scenarioId = r.rest[0];
-    const stepNum = workflowStep + 1; // convert 0-based → 1-based
-    window.location.hash = `#/scenario/${scenarioId}/step/${stepNum}`;
+    const stepNum = workflowStep + 1;
+    const newHash = `#/scenario/${scenarioId}/step/${stepNum}`;
+    if (window.location.hash !== newHash) {
+      window.location.hash = newHash;
+      return;
+    }
   }
 
-  // 3) Update UI
   applyPaneVisibility();
   renderStepper();
 }
-
 
 function applyPaneVisibility() {
   const step = WORKFLOW[workflowStep];
   const allowed = new Set(step.panes);
 
-  document.querySelectorAll("[data-pane]").forEach(el => {
+  document.querySelectorAll("[data-pane]").forEach((el) => {
     const key = el.getAttribute("data-pane");
     el.style.display = allowed.has(key) ? "" : "none";
   });
 
-  // Update header pill
   const stepPill = $("stepPill");
-  if (stepPill) stepPill.textContent = `Step ${workflowStep + 1} of ${WORKFLOW.length}`;
+  if (stepPill) {
+    stepPill.textContent = `Step ${workflowStep + 1} of ${WORKFLOW.length}`;
+  }
 }
 
 function renderStepper() {
@@ -415,47 +471,70 @@ function renderStepper() {
 
   stepper.innerHTML = WORKFLOW.map((s, idx) => {
     const active = idx === workflowStep;
-    return `<button class="btn" type="button" data-step="${idx}" style="${active ? "font-weight:600;" : ""}">
-      ${idx + 1}. ${s.name}
-    </button>`;
+    return `
+      <button class="btn" type="button" data-step="${idx}" style="${active ? "font-weight:600;" : ""}">
+        ${idx + 1}. ${escapeHtml(s.name)}
+      </button>
+    `;
   }).join("");
 
   stepCopy.textContent = WORKFLOW[workflowStep].copy;
 
-  stepper.querySelectorAll("[data-step]").forEach(btn => {
-    btn.addEventListener("click", () => setWorkflowStep(Number(btn.getAttribute("data-step"))));
-  });
-
   backBtn.disabled = workflowStep === 0;
   nextBtn.disabled = workflowStep === WORKFLOW.length - 1;
-
-  backBtn.onclick = () => setWorkflowStep(workflowStep - 1);
-  nextBtn.onclick = () => setWorkflowStep(workflowStep + 1);
-
   nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Review full decision" : "Continue";
 }
 
+function wireWorkflowUI() {
+  if (workflowUIWired) return;
+  workflowUIWired = true;
+
+  const stepper = $("stepper");
+  const backBtn = $("backStepBtn");
+  const nextBtn = $("nextStepBtn");
+
+  if (!stepper || !backBtn || !nextBtn) {
+    console.warn("Workflow UI missing: #stepper/#backStepBtn/#nextStepBtn not found");
+    return;
+  }
+
+  stepper.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-step]");
+    if (!btn) return;
+    setWorkflowStep(Number(btn.getAttribute("data-step")));
+  });
+
+  backBtn.addEventListener("click", () => setWorkflowStep(workflowStep - 1));
+  nextBtn.addEventListener("click", () => setWorkflowStep(workflowStep + 1));
+}
+
 function renderScoreBars(sc) {
-  const el = document.getElementById("scoreBars");
+  const el = $("scoreBars");
   if (!el) return;
 
   const rec = sc.recommendation || {};
   const rows = Array.isArray(rec.scoreTable) ? [...rec.scoreTable] : [];
-  if (!rows.length) { el.innerHTML = ""; return; }
+  if (!rows.length) {
+    el.innerHTML = "";
+    return;
+  }
 
-  // Sort by overall descending
   rows.sort((a, b) => (b.overall ?? 0) - (a.overall ?? 0));
-  const max = Math.max(...rows.map(r => r.overall ?? 0), 1);
+  const max = Math.max(...rows.map((r) => r.overall ?? 0), 1);
 
-  const optionName = (id) => (sc.options || []).find(o => o.id === id)?.name || `Option ${id}`;
+  const optionName = (id) =>
+    (sc.options || []).find((o) => o.id === id)?.name || `Option ${id}`;
 
-  el.innerHTML = rows.map(r => {
+  el.innerHTML = rows.map((r) => {
     const pct = Math.round(((r.overall ?? 0) / max) * 100);
     const isRec = r.optionId === rec.recommendedOptionId;
     return `
       <div style="margin:10px 0">
         <div style="display:flex; justify-content:space-between; gap:10px; align-items:baseline;">
-          <div><b>${r.optionId}</b> — ${escapeHtml(optionName(r.optionId))} ${isRec ? `<span class="badge">Recommended</span>` : ``}</div>
+          <div>
+            <b>${escapeHtml(r.optionId)}</b> — ${escapeHtml(optionName(r.optionId))}
+            ${isRec ? `<span class="badge">Recommended</span>` : ``}
+          </div>
           <div><b>${r.overall ?? "—"}</b></div>
         </div>
         <div style="height:10px; border-radius:999px; overflow:hidden; background: rgba(0,0,0,0.08); margin-top:6px">
@@ -469,7 +548,13 @@ function renderScoreBars(sc) {
 function boot() {
   wireHeaderButtons();
 
-  if (!window.location.hash) goTo("#/home");
+  if (typeof updateAIStatus === "function") {
+    updateAIStatus();
+  }
+
+  if (!window.location.hash) {
+    goTo("#/home");
+  }
 
   handleRoute();
   onRouteChange(handleRoute);
