@@ -13,6 +13,8 @@ Try the interactive DecisionLens demo:
 
 👉 https://jleggett987.github.io/decisionlens-explainable-ai/
 
+![DecisionLens Demo](docs/decisionlens-demo.png)
+
 The demo includes:
 
 • Interactive decision scenarios
@@ -233,4 +235,5 @@ As AI systems increasingly influence high-stakes decisions, tools like DecisionL
 License
 
 MIT License
+
 
