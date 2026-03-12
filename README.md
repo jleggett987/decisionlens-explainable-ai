@@ -41,6 +41,10 @@ In regulated or high-risk environments, that lack of transparency is a serious p
 
 DecisionLens focuses on structured, explainable reasoning rather than opaque optimization.
 
+### Decision Workflow
+
+![DecisionLens Workflow](docs/workflow-demo.png)
+
 How DecisionLens Works
 
 DecisionLens models decisions as a structured reasoning process:
@@ -235,5 +239,6 @@ As AI systems increasingly influence high-stakes decisions, tools like DecisionL
 License
 
 MIT License
+
 
 
