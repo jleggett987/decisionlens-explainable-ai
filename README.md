@@ -1,144 +1,172 @@
-# DecisionLens
-
+DecisionLens
 Explainable AI for High-Stakes Decisions
 
-DecisionLens is a lightweight decision-support framework designed to help teams evaluate complex decisions involving constraints, trade-offs, and uncertainty.
+DecisionLens is an explainable decision-support application that helps users evaluate complex decision scenarios involving competing priorities, constraints, and uncertainty.
 
-Instead of producing a black-box answer, DecisionLens shows the reasoning behind recommendations.
+Unlike traditional tools that produce opaque results, DecisionLens exposes the reasoning behind recommendations, allowing decision makers to understand why a particular option is preferred.
 
----
+The goal is not to replace human judgment but to support transparent, accountable decision-making.
 
-## The Problem
+Live Demo
 
-Organizations make complex decisions every day:
+Try the interactive DecisionLens demo:
 
-• Choosing technology platforms  
-• Evaluating AI deployment risks  
-• Selecting vendors  
-• Balancing cost, risk, and performance  
+👉 https://jleggett987.github.io/decisionlens-explainable-ai/
 
-Traditional tools often produce answers without explaining the reasoning.
+The demo includes:
 
-DecisionLens focuses on **decision transparency**.
+• Interactive decision scenarios
+• Step-by-step decision walkthrough
+• Option comparison and scoring
+• Human impact analysis
+• Explainable recommendation reasoning
+• Optional AI-assisted analysis mode
 
----
+Users can explore how DecisionLens evaluates complex decisions and understand the reasoning behind recommendations.
 
-## How DecisionLens Works
+The Problem
 
-### The Decision Workflow
+Organizations face complex decisions every day:
 
-DecisionLens guides you through a structured 5-step decision process:
+• Deploying AI systems responsibly
+• Choosing technology platforms
+• Evaluating vendors and risk exposure
+• Balancing cost, safety, fairness, and performance
 
-1. **Understand the decision** — Align on the decision, its context, and what is not being automated
-2. **Explore options** — Surface reasonable alternatives before weighing evidence or outcomes
-3. **Weigh values & constraints** — Make priorities and limits explicit before evaluating outcomes
-4. **Assess risk, impact & uncertainty** — Examine evidence, human impact, and where you could be wrong
-5. **Decide & safeguard** — Present a defensible recommendation with accountability and next actions
+Many AI systems produce black-box outputs that cannot easily be explained or audited.
 
-At each step, DecisionLens displays:
-- **Option scores** — Weighted analysis based on defined values
-- **Trade-off analysis** — What you gain and lose with each choice
-- **Constraint validation** — Whether options meet your requirements
-- **AI-powered insights** (optional) — Analysis and reasoning from the AI engine  
+In regulated or high-risk environments, that lack of transparency is a serious problem.
 
----
+DecisionLens focuses on structured, explainable reasoning rather than opaque optimization.
 
-## Features
+How DecisionLens Works
 
-✅ **Interactive Web Interface** — Open in any browser, no installation required
+DecisionLens models decisions as a structured reasoning process:
 
-✅ **Guided Decision Workflow** — Step-by-step guidance through complex decisions
+Define the decision scenario
 
-✅ **Explainable Scoring** — See exactly how each option is ranked and why
+Enumerate possible options
 
-✅ **AI-Powered Analysis** — Toggle AI features on/off to:
-  - Generate alternative recommendations
-  - Analyze trade-offs automatically
-  - Identify constraint violations
-  - Provide reasoning for suggestions
+Identify constraints and priorities
 
-✅ **Real-Time Visualizations** — Score bars, confidence badges, and analysis cards
+Evaluate tradeoffs and uncertainty
 
-✅ **Structured Decision Models** — Predefined scenarios and templates
+Generate a transparent recommendation
 
----
+Each recommendation includes:
 
-## Getting Started
+• Primary reasoning
+• Key tradeoffs
+• Constraint validation
+• Human impact analysis
+• Uncertainty assessment
+• Confidence level
 
-### View a Decision Scenario
+This allows decision makers to see not just what decision is recommended, but why it was recommended.
 
-1. Open `docs/index.html` in a web browser
-2. From the home screen, select a scenario (e.g., "AI Deployment Governance")
-3. Select an option to preview details
-4. Click "Start workflow" to begin the guided decision process
+Example Output
+Recommended Option: Controlled AI Deployment
 
-### Using the Workflow
+Confidence Score: 81%
 
-- Navigate through the 5-step workflow using **Back** and **Continue** buttons
-- At Step 5, view the full recommendation, confidence score, and reasoning
-- Use the **AI: On/Off** toggle (top right) to enable AI analysis
-  - When **AI is ON**: A "DecisionLens Analysis" card appears with AI-generated insights
-  - When **AI is OFF**: Only the static recommendation is shown
+Primary Reason:
+Balances innovation velocity with governance safeguards.
 
-### Copying & Sharing
+Key Tradeoff:
+Introduces operational oversight to reduce uncontrolled risk exposure.
 
-- Click **Copy summary** to copy the recommendation to your clipboard
-- Share the scenario link or take screenshots of the analysis
+Safeguards:
+• staged deployment
+• monitoring thresholds
+• review checkpoints
 
----
+DecisionLens focuses on making the reasoning visible, not just the final outcome.
 
-### Static Recommendation
+Example Scenarios
 
-**Recommended Option:** Controlled AI Deployment
+The repository currently includes structured decision scenarios such as:
 
-**Confidence Score:** 81%
+AI Deployment Governance
 
-**Reasoning:**
+Evaluates how organizations can deploy AI systems responsibly while maintaining innovation.
 
-Controlled deployment allows governance mechanisms to evaluate risk while maintaining innovation velocity.
-
-**Tradeoffs:**
-
-• Increased operational overhead  
-• Slower deployment cycles  
-• Reduced uncontrolled risk exposure
-
-### AI Analysis (when enabled)
-
-When you toggle **AI: On**, DecisionLens displays an additional analysis card with:
-
-- **AI Recommendation** — Alternative recommendation from the AI engine
-- **Confidence Analysis** — How confident the AI is in its recommendation
-- **Score Breakdown** — Detailed scoring for each option
-- **Constraint Check** — Which constraints are satisfied/violated
-- **Evidence Synthesis** — How evidence was evaluated
-
----
-
-## Example Scenarios
-
-The repository currently includes several structured decision scenarios:
-
-AI Deployment Governance  
 Fraud Detection Access Control
 
-These demonstrate how DecisionLens evaluates complex tradeoffs.
+Balances fraud prevention with user access fairness in real-time decision systems.
 
----
+These scenarios demonstrate how DecisionLens analyzes complex tradeoffs and produces explainable recommendations.
 
-## Repository Structure
+System Architecture
 
-Decision_Schema.md  
+DecisionLens follows a structured reasoning pipeline:
+
+Scenario Data
+      ↓
+Decision Engine
+      ↓
+Multi-Criteria Scoring
+      ↓
+Tradeoff Analysis
+      ↓
+Explanation Generator
+      ↓
+Recommendation Output
+
+This design ensures decisions remain auditable, explainable, and defensible.
+
+Repository Structure
+scenarios.js
+Structured decision scenarios used by the demo
+
+app.js
+Application routing and workflow logic
+
+render.js
+UI rendering and explainability visualization
+
+scoring-engine.js
+Multi-criteria decision scoring engine
+
+explanation-generator.js
+Natural-language explanation generation
+
+ai-service.js
+AI-assisted analysis and recommendation engine
+
+Decision_Schema.md
 Core decision modeling framework
+Key Principles
 
-SCENARIO_ai_deployment_governance.md  
-Example decision model for AI deployment governance
+DecisionLens is built around several core principles.
 
-SCENARIO_fraud_access_001.md  
-Example decision model for fraud detection access control
+Explainability
 
----
+Recommendations must be understandable and auditable.
 
-## Vision
+Constraint Awareness
 
-DecisionLens aims to make complex decision-making more transparent, structured, and explainable.
+Hard constraints and ethical limits are evaluated before scoring options.
+
+Tradeoff Transparency
+
+Competing values and impacts are explicitly surfaced.
+
+Human Accountability
+
+The system supports human decision makers rather than replacing them.
+
+Vision
+
+DecisionLens aims to become a framework for transparent AI-assisted decision systems used in domains such as:
+
+• AI governance
+• regulatory compliance
+• healthcare decision support
+• financial risk management
+• technology strategy and procurement
+
+As AI systems increasingly influence high-stakes decisions, tools like DecisionLens help ensure those decisions remain explainable and accountable.
+
+License
+
+MIT License
