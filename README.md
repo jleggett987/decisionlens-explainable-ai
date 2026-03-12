@@ -1,4 +1,11 @@
-DecisionLens
+## Author
+
+Jason Leggett  
+Senior Software Engineer / Engineering Lead  
+
+LinkedIn: https://linkedin.com/in/jasonleggett  
+
+### DecisionLens
 Explainable AI for High-Stakes Decisions
 
 DecisionLens is an explainable decision-support application that helps users evaluate complex decision scenarios involving competing priorities, constraints, and uncertainty.
@@ -7,7 +14,7 @@ Unlike traditional tools that produce opaque results, DecisionLens exposes the r
 
 The goal is not to replace human judgment but to support transparent, accountable decision-making.
 
-Live Demo
+### Live Demo
 
 Try the interactive DecisionLens demo:
 
@@ -26,7 +33,7 @@ The demo includes:
 
 Users can explore how DecisionLens evaluates complex decisions and understand the reasoning behind recommendations.
 
-The Problem
+### The Problem
 
 Organizations face complex decisions every day:
 
@@ -70,7 +77,7 @@ Each recommendation includes:
 
 This allows decision makers to see not just what decision is recommended, but why it was recommended.
 
-Example Output
+### Example Output
 Recommended Option: Controlled AI Deployment
 
 Confidence Score: 81%
@@ -88,7 +95,7 @@ Safeguards:
 
 DecisionLens focuses on making the reasoning visible, not just the final outcome.
 
-Example Scenarios
+### Example Scenarios
 
 The repository currently includes structured decision scenarios such as:
 
@@ -236,9 +243,10 @@ DecisionLens aims to become a framework for transparent AI-assisted decision sys
 
 As AI systems increasingly influence high-stakes decisions, tools like DecisionLens help ensure those decisions remain explainable and accountable.
 
-License
+### License
 
 MIT License
+
 
 
 
