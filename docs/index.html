@@ -61,6 +61,12 @@
     }
     .toast.show { opacity: 0.92; }
 
+    /* AI-specific styles */
+    .ai-enabled { background: #d4f7d4; color: #1a5c1a; border-color: #b8e6b8; }
+    .ai-processing { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+    #aiToggleBtn { font-weight: 500; }
+    #aiToggleBtn.ai-active { background: #e8f5e9; border-color: #4caf50; }
+
   </style>
 </head>
 
@@ -77,6 +83,8 @@
         <span class="pill" id="stakePill">Stake</span>
         <button class="btn" id="homeBtn" type="button">Home</button>
         <button class="btn" id="copySummaryBtn" type="button">Copy summary</button>
+        <button class="btn" id="aiToggleBtn" type="button">AI: Off</button>
+        <span class="pill" id="aiStatus">AI Off</span>
       </div>
     </div>
   </header>
@@ -136,7 +144,25 @@
       </section>
 
       <div class="grid">
-        <section class="card" data-pane="prompt">
+            <section class="card" id="aiAnalysisCard" style="display:none; border-left: 4px solid #4CAF50;">
+              <div class="recTitle">
+                <strong>AI Analysis</strong>
+                <span class="badge" style="background:#4CAF50">AI</span>
+              </div>
+              <div class="kvs">
+                <div><b>Recommended Option:</b> <span id="aiOption"></span></div>
+                <div><b>Confidence:</b> <span id="aiConfidence"></span></div>
+              </div>
+              <div style="margin-top:10px">
+                <div class="small"><b>Primary Reason</b></div>
+                <div class="muted" id="aiPrimaryReason"></div>
+              </div>
+              <div style="margin-top:10px">
+                <div class="small"><b>Key Tradeoff</b></div>
+                <div class="muted" id="aiTradeoff"></div>
+              </div>
+            </section>
+
           <h2>Decision prompt</h2>
           <p class="muted" id="prompt"></p>
         </section>

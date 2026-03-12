@@ -270,3 +270,33 @@ function updateSelectionVisibility() {
   // setPaneVisible("score", hasSelection);
 }
 
+export function hideAIAnalysisCard() {
+  const card = document.getElementById("aiAnalysisCard");
+  if (card) card.style.display = "none";
+}
+
+export function renderAIAnalysisCard(aiRecommendation, aiAnalysis, currentScenario) {
+  const card = document.getElementById("aiAnalysisCard");
+  if (!card || !aiRecommendation || !aiAnalysis) {
+    hideAIAnalysisCard();
+    return;
+  }
+
+  card.style.display = "";
+
+  const optionId = aiRecommendation.recommendedOptionId;
+  let optionName = `Option ${optionId}`;
+  
+  if (currentScenario?.options) {
+    const option = currentScenario.options.find(o => o.id === optionId);
+    if (option) optionName = option.name || `Option ${optionId}`;
+  }
+
+  document.getElementById("aiOption").textContent = optionName;
+  document.getElementById("aiConfidence").textContent = 
+    `${Math.round((aiRecommendation.confidence || 0) * 100)}%`;
+  document.getElementById("aiPrimaryReason").textContent = 
+    aiRecommendation.reasoning || aiRecommendation.explanation || "Analysis complete.";
+  document.getElementById("aiTradeoff").textContent = 
+    aiAnalysis.scoring?.tradeoff?.description || "Balances multiple constraints and values.";
+}
