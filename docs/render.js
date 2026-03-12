@@ -32,6 +32,23 @@ function escapeHtml(s) {
 }
 
 export function renderScenario(sc) {
+  const banner = document.getElementById("decisionBanner");
+
+if (sc?.recommendation) {
+  banner.style.display = "";
+
+  document.getElementById("decisionBannerTitle").textContent =
+    `Recommended: Option ${sc.recommendation.recommendedOptionId}`;
+
+  document.getElementById("decisionBannerReason").textContent =
+    sc.recommendation.primaryReason;
+
+  document.getElementById("decisionBannerConfidence").textContent =
+    `Confidence: ${sc.recommendation.confidence}`;
+} else {
+  banner.style.display = "none";
+}
+  
   // Start guided flow unselected each time a scenario loads
   selectedOptionId = null;
 
