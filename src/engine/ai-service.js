@@ -2,14 +2,18 @@
 // Main AI service for DecisionLens - integrates scoring, explanation, and data processing
 
 // Use window references for dependencies
-const generateOptionScores = window.generateOptionScores;
-const findBestOption = window.findBestOption;
-const calculateConfidence = window.calculateConfidence;
-const analyzeTradeoffs = window.analyzeTradeoffs;
-const generateRecommendation = window.generateRecommendation;
-const validateScenario = window.validateScenario;
-const checkConstraints = window.checkConstraints;
-const prepareScenarioForAI = window.prepareScenarioForAI;
+function getAIDeps() {
+  return {
+    generateOptionScores: window.generateOptionScores,
+    findBestOption: window.findBestOption,
+    calculateConfidence: window.calculateConfidence,
+    analyzeTradeoffs: window.analyzeTradeoffs,
+    generateRecommendation: window.generateRecommendation,
+    validateScenario: window.validateScenario,
+    checkConstraints: window.checkConstraints,
+    prepareScenarioForAI: window.prepareScenarioForAI
+  };
+}
 
 // AI Service state
 const AI_STATE = {
@@ -195,16 +199,12 @@ window.getAISummary = function(aiResult) {
  * Toggle AI processing on/off
  */
 window.toggleAI = function() {
-  if (typeof window.setAIEnabled === 'function' && typeof window.getAIState === 'function') {
-    window.setAIEnabled(!AI_STATE.isEnabled);
-    return window.getAIState();
-  } else {
-    AI_STATE.isEnabled = !AI_STATE.isEnabled;
-    window.updateAIStatus && window.updateAIStatus();
-    return { ...AI_STATE };
+  AI_STATE.isEnabled = !AI_STATE.isEnabled;
+  if (typeof window.updateAIStatus === 'function') {
+    window.updateAIStatus();
   }
+  return { ...AI_STATE };
 };
-}
 
 /**
  * Initialize AI service
@@ -215,7 +215,10 @@ window.initAIService = function() {
   const aiParam = urlParams.get('ai');
   
   if (aiParam === 'true' || aiParam === '1') {
-    setAIEnabled(true);
+    AI_STATE.isEnabled = true;
+    if (typeof window.updateAIStatus === 'function') {
+      window.updateAIStatus();
+    }
   }
 
   return getAIState();

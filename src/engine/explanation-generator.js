@@ -55,7 +55,7 @@ window.generatePrimaryReason = function(scenario, recommendedOption, scoreTable,
  * @param {Array} scoreTable - Score table
  * @returns {string} Key tradeoff text
  */
-export function generateKeyTradeoff(scenario, recommendedOption, _scoreTable) {
+window.generateKeyTradeoff = function(scenario, recommendedOption, _scoreTable) {
   if (!scenario || !recommendedOption) {
     return "Tradeoffs depend on contextual factors.";
   }
@@ -107,7 +107,7 @@ export function generateKeyTradeoff(scenario, recommendedOption, _scoreTable) {
  * @param {Object} recommendedOption - The recommended option
  * @returns {Array} Array of constraint check strings
  */
-export function generateConstraintCheck(scenario, recommendedOption) {
+window.generateConstraintCheck = function(scenario, recommendedOption) {
   if (!scenario) return ["Unable to verify constraints."];
 
   const { constraints, options } = scenario;
@@ -202,7 +202,7 @@ function isConstraintSatisfied(constraint, option, _options) {
  * @param {Object} recommendedOption - The recommended option
  * @returns {Array} Array of safeguard strings
  */
-export function generateSafeguards(scenario, recommendedOption) {
+window.generateSafeguards = function(scenario, recommendedOption) {
   if (!scenario) return ["Implement standard monitoring and review processes."];
 
   const { domain, constraints, uncertainty } = scenario;
@@ -275,7 +275,7 @@ export function generateSafeguards(scenario, recommendedOption) {
  * @param {Object} recommendation - The recommendation object
  * @returns {string} Full explanation text
  */
-export function generateExplanation(scenario, recommendation) {
+window.generateExplanation = function(scenario, recommendation) {
   if (!scenario || !recommendation) {
     return "The recommended option represents the best balance based on available data.";
   }
@@ -321,50 +321,36 @@ export function generateExplanation(scenario, recommendation) {
 }
 
 /**
- * Generates a complete recommendation object
+ * Generates a complete recommendation object matching static scenario format
  * @param {Object} scenario - The scenario object
- * @param {Object} scoringResult - Result from scoring engine
- * @returns {Object} Complete recommendation
+ * @param {Object} scoringResult - Result from scoring engine {scoreTable, bestOption, confidence, tradeoff}
+ * @returns {Object} Complete recommendation with all fields
  */
-export function generateRecommendation(scenario, scoringResult) {
+window.generateRecommendation = function(scenario, scoringResult) {
   if (!scenario || !scoringResult) {
-    return {
-      recommendedOptionId: "A",
-      confidence: "Medium",
-      primaryReason: "Default recommendation based on available data.",
-      keyTradeoff: "Standard tradeoff applies.",
-      constraintCheck: ["Check completed."],
-      explanation: "Recommendation generated with standard parameters.",
-      safeguards: ["Implement standard monitoring."],
-      scoreTable: []
-    };
+    throw new Error("Scenario and scoringResult are required");
   }
 
-  const { scoreTable } = scoringResult;
-  const bestOption = scoringResult.bestOption;
-  const confidence = scoringResult.confidence;
-  const tradeoff = scoringResult.tradeoff;
+  const { scoreTable, bestOption, confidence, tradeoff } = scoringResult;
+  const recommendedOptionId = bestOption?.optionId || "A"; // Fallback
+  const recommendedOption = scenario.options?.find(o => o.id === recommendedOptionId);
 
-  const recommendedOption = scenario.options?.find(o => o.id === bestOption?.optionId);
+  // Generate components using existing helpers
+  const primaryReason = window.generatePrimaryReason(scenario, recommendedOption, scoreTable, confidence);
+  const keyTradeoff = window.generateKeyTradeoff(scenario, recommendedOption, scoreTable);
+  const constraintCheck = window.generateConstraintCheck(scenario, recommendedOption);
+  const safeguards = window.generateSafeguards(scenario, recommendedOption);
+  const explanation = window.generateExplanation(scenario, { recommendedOptionId });
 
   return {
-    recommendedOptionId: bestOption?.optionId || "A",
+    recommendedOptionId,
     confidence,
-    primaryReason: generatePrimaryReason(scenario, recommendedOption, scoreTable, confidence),
-    keyTradeoff: tradeoff?.keyTradeoff || generateKeyTradeoff(scenario, recommendedOption, scoreTable),
-    constraintCheck: generateConstraintCheck(scenario, recommendedOption),
-    explanation: generateExplanation(scenario, { recommendedOptionId: bestOption?.optionId }),
-    safeguards: generateSafeguards(scenario, recommendedOption),
-    scoreTable
+    primaryReason,
+    keyTradeoff,
+    constraintCheck,
+    scoreTable,
+    explanation,
+    safeguards
   };
-}
-
-export default {
-  generatePrimaryReason,
-  generateKeyTradeoff,
-  generateConstraintCheck,
-  generateSafeguards,
-  generateExplanation,
-  generateRecommendation
 };
 

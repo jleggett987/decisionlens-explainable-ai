@@ -61,7 +61,7 @@ window.validateScenario = function(scenario) {
  * @param {Array} evidence - Array of evidence objects
  * @returns {Object} Synthesized evidence assessment
  */
-export function synthesizeEvidence(evidence) {
+window.synthesizeEvidence = function(evidence) {
   if (!evidence || evidence.length === 0) {
     return {
       summary: "No evidence available.",
@@ -143,7 +143,7 @@ function generateEvidenceSummary(directions, overallDirection) {
  * @param {Object} evidenceSynthesis - Result from synthesizeEvidence
  * @returns {Object} Quantified uncertainty
  */
-export function quantifyUncertainty(uncertainty, evidenceSynthesis) {
+window.quantifyUncertainty = function(uncertainty, evidenceSynthesis) {
   const result = {
     level: uncertainty?.level || "Medium",
     score: 50, // 0-100, higher = more uncertain
@@ -197,7 +197,7 @@ export function quantifyUncertainty(uncertainty, evidenceSynthesis) {
  * @param {Object} option - The option being considered
  * @returns {Object} Constraint check result
  */
-export function checkConstraints(constraints, option) {
+window.checkConstraints = function(constraints, option) {
   if (!constraints || constraints.length === 0) {
     return {
       allSatisfied: true,
@@ -291,7 +291,7 @@ function evaluateConstraint(constraint, option) {
  * @param {Array} impactArray - Array of impact objects
  * @returns {Object} Processed impact data
  */
-export function processImpact(option, impactArray) {
+window.processImpact = function(option, impactArray) {
   if (!option || !impactArray) {
     return {
       humanImpact: "Impact data not available.",
@@ -364,7 +364,7 @@ function calculateReversibilityScore(cost) {
  * @param {Object} scenario - Raw scenario object
  * @returns {Object} Processed scenario ready for AI analysis
  */
-export function prepareScenarioForAI(scenario) {
+window.prepareScenarioForAI = function(scenario) {
   const validation = validateScenario(scenario);
   
   if (!validation.isValid) {
@@ -386,12 +386,6 @@ export function prepareScenarioForAI(scenario) {
   };
 }
 
-export default {
-  validateScenario,
-  synthesizeEvidence,
-  quantifyUncertainty,
-  checkConstraints,
-  processImpact,
-  prepareScenarioForAI
-};
+// No default export. All functions are attached to window for browser compatibility.
+
 

@@ -45,7 +45,7 @@ window.calculateWeightedScore = function(optionScores, values, valueKeyMap = {})
  * @param {Array} scoreTable - Array of score objects with optionId and overall scores
  * @returns {Array} Sorted array (highest first) with rank
  */
-export function rankOptions(scoreTable) {
+window.rankOptions = function(scoreTable) {
   if (!scoreTable || scoreTable.length === 0) return [];
 
   return [...scoreTable]
@@ -59,7 +59,7 @@ export function rankOptions(scoreTable) {
  * @param {Array} scoreTable - Array of score objects
  * @returns {Object} The top-ranked option
  */
-export function findBestOption(scoreTable) {
+window.findBestOption = function(scoreTable) {
   const ranked = rankOptions(scoreTable);
   return ranked.length > 0 ? ranked[0] : null;
 }
@@ -69,7 +69,7 @@ export function findBestOption(scoreTable) {
  * @param {Array} scoreTable - Array of score objects with overall scores
  * @returns {string} Confidence level: "High", "Medium", or "Low"
  */
-export function calculateConfidence(scoreTable) {
+window.calculateConfidence = function(scoreTable) {
   if (!scoreTable || scoreTable.length < 2) return "Medium";
 
   const scores = scoreTable.map(s => s.overall ?? 0).filter(s => s > 0);
@@ -93,7 +93,7 @@ export function calculateConfidence(scoreTable) {
  * @param {Array} values - Value definitions
  * @returns {Object} Tradeoff analysis
  */
-export function analyzeTradeoffs(scoreTable, values) {
+window.analyzeTradeoffs = function(scoreTable, values) {
   if (!scoreTable || scoreTable.length < 2 || !values) {
     return { keyTradeoff: "Tradeoffs are context-dependent." };
   }
@@ -150,7 +150,7 @@ export function analyzeTradeoffs(scoreTable, values) {
  * @param {Object} scenario - Complete scenario object
  * @returns {Array} Score table with scores for each option
  */
-export function generateOptionScores(scenario) {
+window.generateOptionScores = function(scenario) {
   if (!scenario || !scenario.options || !scenario.values) {
     return [];
   }
@@ -236,13 +236,10 @@ function generateValueScore(option, value, _scenario) {
   }
 }
 
-export default {
-  normalizeValue,
-  calculateWeightedScore,
-  rankOptions,
-  findBestOption,
-  calculateConfidence,
-  analyzeTradeoffs,
-  generateOptionScores
-};
+window.normalizeValue = normalizeValue;
+window.calculateWeightedScore = calculateWeightedScore;
+window.rankOptions = rankOptions;
+window.findBestOption = findBestOption;
+window.calculateConfidence = calculateConfidence;
+window.analyzeTradeoffs = analyzeTradeoffs;
 
