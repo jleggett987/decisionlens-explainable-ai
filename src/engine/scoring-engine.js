@@ -231,6 +231,22 @@ function generateValueScore(option, value, _scenario) {
       }
       return 50 + Math.floor(Math.random() * 20);
 
+    case "Business Value":
+    case "Governance & Compliance":
+    case "Explainability":
+    case "Accountability":
+      // AI Governance heuristics
+      if (name.toLowerCase().includes("immediate") || name.toLowerCase().includes("full")) {
+        return 75 + Math.floor(Math.random() * 10); // High business, low governance
+      }
+      if (name.toLowerCase().includes("delay")) {
+        return 25 + Math.floor(Math.random() * 10); // Low business, high governance
+      }
+      if (name.toLowerCase().includes("limited") || name.toLowerCase().includes("guarded") || name.toLowerCase().includes("constrained")) {
+        return 70 + Math.floor(Math.random() * 15); // Balanced
+      }
+      return baseScore + Math.floor(Math.random() * 20) - 10;
+
     default:
       return baseScore + Math.floor(Math.random() * 30) - 15;
   }

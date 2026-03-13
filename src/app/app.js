@@ -574,7 +574,7 @@ function renderScoreRadarChart(sc) {
   const datasets = rows.map((row, idx) => {
     const data = sc.values.map(v => {
       const key = VALUE_SCORE_KEY_MAP[v.name];
-      return key ? (row[key] ?? 0) : 0;
+      return key ? (row[key] ?? row[v.name.toLowerCase().replace(/\s+/g, '')] ?? 50) : 50;
     });
 
     const isRecommended = row.optionId === rec.recommendedOptionId;

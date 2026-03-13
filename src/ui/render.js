@@ -2,18 +2,23 @@
 
 const VALUE_SCORE_KEY_MAP = {
   "Fraud Prevention": "fraudPrevention",
-  "Patient Safety": "fraudPrevention", // reused column
+  "Patient Safety": "fraudPrevention",
   "Harm Reduction": "fraudPrevention",
-
   "User Access & Fairness": "fairness",
   "Fair Access": "fairness",
   "Fairness & Due Process": "fairness",
-
   "Trust & Transparency": "trust",
   "Trust & Legibility": "trust",
-
   "Operational Efficiency": "efficiency",
-  "Operational Flow": "efficiency"
+  "Operational Flow": "efficiency",
+  "Risk Exposure": "fraudPrevention",
+  "Regulatory Compliance": "fairness",
+  "Public Trust": "trust",
+  "Innovation Velocity": "efficiency",
+  "Business Value": "efficiency",
+  "Explainability": "trust",
+  "Governance & Compliance": "fairness",
+  "Accountability": "trust"
 };
 
 
@@ -238,7 +243,7 @@ function renderScoreTable(sc, selectedOptionId) {
 
     const valueCells = sc.values.map(v => {
       const key = VALUE_SCORE_KEY_MAP[v.name];
-      const val = key ? r[key] : "—";
+      const val = key ? (r[key] ?? r[v.name.toLowerCase().replace(/\s+/g, '')] ?? 50) : 50;
       return `<td>${val}</td>`;
     }).join("");
 

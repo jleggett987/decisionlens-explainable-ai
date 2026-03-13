@@ -14,7 +14,18 @@ const VALUE_SCORE_KEY_MAP = {
   "Trust & Legibility": "trust",
 
   "Operational Efficiency": "efficiency",
-  "Operational Flow": "efficiency"
+  "Operational Flow": "efficiency",
+
+  "Risk Exposure": "fraudPrevention",
+  "Regulatory Compliance": "fairness",
+  "Public Trust": "trust",
+  "Innovation Velocity": "efficiency",
+  
+  // New mappings for AI governance scenario
+  "Business Value": "efficiency",
+  "Explainability": "trust",
+  "Governance & Compliance": "fairness",
+  "Accountability": "trust"
 };
 
 window.VALUE_SCORE_KEY_MAP = VALUE_SCORE_KEY_MAP;
@@ -26,7 +37,7 @@ window.DECISIONLENS_SCENARIOS = [
     domain: "Finance / Digital Services",
     stakeLevel: "High",
     prompt:
-      "An automated system must decide whether to approve or deny a user’s service request based on potential fraud risk. The available data is incomplete and partially conflicting. Denying access may prevent fraud but could incorrectly block legitimate users, causing harm and loss of trust. Approving access improves user experience but increases exposure to potential abuse. The decision must be made in real time.",
+      "An automated system must decide whether to approve or deny a user's service request based on potential fraud risk. The available data is incomplete and partially conflicting. Denying access may prevent fraud but could incorrectly block legitimate users, causing harm and loss of trust. Approving access improves user experience but increases exposure to potential abuse. The decision must be made in real time.",
 
     options: [
       {
@@ -213,7 +224,7 @@ window.DECISIONLENS_SCENARIOS = [
       },
       {
         id: "C3",
-        type: "operational",
+        type: "operational", 
         severity: "hard",
         statement: "The process must be usable by front-desk staff within real-time constraints."
       }
@@ -311,152 +322,297 @@ window.DECISIONLENS_SCENARIOS = [
         "Review calibration monthly and update staff guidance"
       ]
     }
-},
-{
-  id: "moderation_policy_001",
-  title: "Content Moderation Under Ambiguous Harm Signals",
-  domain: "Platforms / Trust & Safety",
-  stakeLevel: "High",
-  prompt:
-    "A platform must decide whether to remove, label, or allow a piece of content that may be harmful but is ambiguous. Automated signals are mixed: some indicators suggest incitement or harassment, while others suggest satire or legitimate political speech. Removing content may prevent harm but risks unjust censorship and loss of credibility. Allowing it may protect expression but increase harm exposure. The decision must be fast and defensible.",
-
-  options: [
-    {
-      id: "A",
-      name: "Allow",
-      description: "Leave the content up with no additional actions.",
-      reversibility: "Reversible",
-      timeHorizon: "Immediate"
-    },
-    {
-      id: "B",
-      name: "Remove",
-      description: "Remove the content and issue an enforcement action to the account.",
-      reversibility: "Partially reversible (appeal required)",
-      timeHorizon: "Immediate"
-    },
-    {
-      id: "C",
-      name: "Label + Limit Reach",
-      description: "Keep the content but label it, reduce distribution, and route to expedited human review.",
-      reversibility: "Reversible",
-      timeHorizon: "Immediate / Short-term"
-    }
-  ],
-
-  constraints: [
-    {
-      id: "C1",
-      type: "safety",
-      severity: "hard",
-      statement: "Content that plausibly targets protected groups with harassment must be addressed promptly."
-    },
-    {
-      id: "C2",
-      type: "rights",
-      severity: "strong",
-      statement: "Enforcement actions must include an appeal path and a reason that can be stated clearly."
-    },
-    {
-      id: "C3",
-      type: "operational",
-      severity: "hard",
-      statement: "Moderation must occur within platform latency and staffing limits."
-    }
-  ],
-
-  values: [
-    { id: "V1", name: "Harm Reduction", weight: 0.35, definition: "Reducing exposure to content likely to cause harm or harassment." },
-    { id: "V2", name: "Fairness & Due Process", weight: 0.25, definition: "Avoiding unjust enforcement and ensuring review/appeal." },
-    { id: "V3", name: "Trust & Legibility", weight: 0.25, definition: "Keeping moderation decisions understandable and consistent." },
-    { id: "V4", name: "Operational Efficiency", weight: 0.15, definition: "Taking actions that scale without excessive human burden." }
-  ],
-
-  evidence: [
-    {
-      id: "S1",
-      description: "Automated classifier flags potential harassment but confidence is moderate.",
-      sourceType: "system",
-      reliability: "medium",
-      direction: "supports remove"
-    },
-    {
-      id: "S2",
-      description: "User reports include conflicting interpretations (harassment vs satire).",
-      sourceType: "human",
-      reliability: "medium",
-      direction: "ambiguous"
-    },
-    {
-      id: "S3",
-      description: "Account has prior borderline violations but no confirmed severe enforcement history.",
-      sourceType: "historical",
-      reliability: "high",
-      direction: "supports limit"
-    }
-  ],
-
-  uncertainty: {
-    level: "Medium",
-    unknowns: [
-      "Whether intent is harassment or satire",
-      "Whether the content will be amplified into high-exposure contexts",
-      "Whether enforcement consistency would be questioned in similar cases"
-    ],
-    riskOfError: [
-      "Over-enforcement causing unjust censorship and backlash",
-      "Under-enforcement enabling real harm to targeted users",
-      "Inconsistent enforcement eroding trust in policy"
-    ]
   },
+  {
+    id: "moderation_policy_001",
+    title: "Content Moderation Under Ambiguous Harm Signals",
+    domain: "Platforms / Trust & Safety",
+    stakeLevel: "High",
+    prompt:
+      "A platform must decide whether to remove, label, or allow a piece of content that may be harmful but is ambiguous. Automated signals are mixed: some indicators suggest incitement or harassment, while others suggest satire or legitimate political speech. Removing content may prevent harm but risks unjust censorship and loss of credibility. Allowing it may protect expression but increase harm exposure. The decision must be fast and defensible.",
 
-  impact: [
-    {
-      optionId: "A",
-      humanImpact: "Protects expression but can leave targeted users exposed to harm and normalization of harassment.",
-      harmTypes: ["safety", "trust"],
-      reversibilityCost: "Low",
-      distributionalEffects: "Harm concentrated on targeted users; benefits accrue broadly to speakers."
+    options: [
+      {
+        id: "A",
+        name: "Allow",
+        description: "Leave the content up with no additional actions.",
+        reversibility: "Reversible",
+        timeHorizon: "Immediate"
+      },
+      {
+        id: "B",
+        name: "Remove",
+        description: "Remove the content and issue an enforcement action to the account.",
+        reversibility: "Partially reversible (appeal required)",
+        timeHorizon: "Immediate"
+      },
+      {
+        id: "C",
+        name: "Label + Limit Reach",
+        description: "Keep the content but label it, reduce distribution, and route to expedited human review.",
+        reversibility: "Reversible",
+        timeHorizon: "Immediate / Short-term"
+      }
+    ],
+
+    constraints: [
+      {
+        id: "C1",
+        type: "safety",
+        severity: "hard",
+        statement: "Content that plausibly targets protected groups with harassment must be addressed promptly."
+      },
+      {
+        id: "C2",
+        type: "rights",
+        severity: "strong",
+        statement: "Enforcement actions must include an appeal path and a reason that can be stated clearly."
+      },
+      {
+        id: "C3",
+        type: "operational",
+        severity: "hard",
+        statement: "Moderation must occur within platform latency and staffing limits."
+      }
+    ],
+
+    values: [
+      { id: "V1", name: "Harm Reduction", weight: 0.35, definition: "Reducing exposure to content likely to cause harm or harassment." },
+      { id: "V2", name: "Fairness & Due Process", weight: 0.25, definition: "Avoiding unjust enforcement and ensuring review/appeal." },
+      { id: "V3", name: "Trust & Legibility", weight: 0.25, definition: "Keeping moderation decisions understandable and consistent." },
+      { id: "V4", name: "Operational Efficiency", weight: 0.15, definition: "Taking actions that scale without excessive human burden." }
+    ],
+
+    evidence: [
+      {
+        id: "S1",
+        description: "Automated classifier flags potential harassment but confidence is moderate.",
+        sourceType: "system",
+        reliability: "medium",
+        direction: "supports remove"
+      },
+      {
+        id: "S2",
+        description: "User reports include conflicting interpretations (harassment vs satire).",
+        sourceType: "human",
+        reliability: "medium",
+        direction: "ambiguous"
+      },
+      {
+        id: "S3",
+        description: "Account has prior borderline violations but no confirmed severe enforcement history.",
+        sourceType: "historical",
+        reliability: "high",
+        direction: "supports limit"
+      }
+    ],
+
+    uncertainty: {
+      level: "Medium",
+      unknowns: [
+        "Whether intent is harassment or satire",
+        "Whether the content will be amplified into high-exposure contexts",
+        "Whether enforcement consistency would be questioned in similar cases"
+      ],
+      riskOfError: [
+        "Over-enforcement causing unjust censorship and backlash",
+        "Under-enforcement enabling real harm to targeted users",
+        "Inconsistent enforcement eroding trust in policy"
+      ]
     },
-    {
-      optionId: "B",
-      humanImpact: "Reduces exposure quickly, but risks unjust punishment and credibility damage if the content is satire or misclassified.",
-      harmTypes: ["rights", "trust", "dignity"],
-      reversibilityCost: "Moderate to high",
-      distributionalEffects: "Burden falls on the speaker; platform credibility risk spreads widely."
-    },
-    {
-      optionId: "C",
-      humanImpact: "Reduces harm exposure while preserving due process; provides transparency via labels and review.",
-      harmTypes: ["minor reach restriction", "operational cost"],
-      reversibilityCost: "Low",
-      distributionalEffects: "Costs distributed between limited distribution and human review capacity."
+
+    impact: [
+      {
+        optionId: "A",
+        humanImpact: "Protects expression but can leave targeted users exposed to harm and normalization of harassment.",
+        harmTypes: ["safety", "trust"],
+        reversibilityCost: "Low",
+        distributionalEffects: "Harm concentrated on targeted users; benefits accrue broadly to speakers."
+      },
+      {
+        optionId: "B",
+        humanImpact: "Reduces exposure quickly, but risks unjust punishment and credibility damage if the content is satire or misclassified.",
+        harmTypes: ["rights", "trust", "dignity"],
+        reversibilityCost: "Moderate to high",
+        distributionalEffects: "Burden falls on the speaker; platform credibility risk spreads widely."
+      },
+      {
+        optionId: "C",
+        humanImpact: "Reduces harm exposure while preserving due process; provides transparency via labels and review.",
+        harmTypes: ["minor reach restriction", "operational cost"],
+        reversibilityCost: "Low",
+        distributionalEffects: "Costs distributed between limited distribution and human review capacity."
+      }
+    ],
+
+    recommendation: {
+      recommendedOptionId: "C",
+      confidence: "Medium",
+      primaryReason: "Balances harm reduction with due process under ambiguity.",
+      keyTradeoff: "Accepts some operational cost to avoid irreversible enforcement errors.",
+      constraintCheck: [
+        "Hard safety constraint addressed via limited reach and expedited review.",
+        "Strong rights constraint satisfied via clear rationale and appeal pathway."
+      ],
+      scoreTable: [
+        { optionId: "A", fraudPrevention: 0,  fairness: 70, trust: 55, efficiency: 90, overall: 61 },
+        { optionId: "B", fraudPrevention: 0,  fairness: 45, trust: 50, efficiency: 80, overall: 56 },
+        { optionId: "C", fraudPrevention: 0,  fairness: 75, trust: 75, efficiency: 65, overall: 72 }
+      ],
+      explanation:
+        "When signals are ambiguous, immediate removal can create irreversible fairness and credibility failures, while allowing content can expose users to harm. Option C is recommended because it reduces harm through distribution limits and labeling while preserving due process with expedited human review. This keeps decisions explainable and reduces the risk of over-enforcement.",
+      safeguards: [
+        "Route to expedited human review with clear criteria",
+        "Provide the user a specific reason and an appeal path",
+        "Measure false positive/false negative rates for similar content",
+        "Publish consistency guidelines for edge cases"
+      ]
     }
-  ],
+  },
+  {
+    id: "ai_deployment_governance_001",
+    title: "AI Deployment Under Explainability and Governance Constraints",
+    domain: "AI Governance / Deployment Decision",
+    stakeLevel: "Very High",
+    prompt: "An organization has developed a machine learning model intended to support high-impact operational decisions. The model shows strong predictive performance but has limited individual-level explainability. Leadership must determine whether to deploy now, delay for improvements, or deploy in a limited/guardrail manner. This is a governance decision balancing value, accountability, and risk.",
 
-  recommendation: {
-    recommendedOptionId: "C",
-    confidence: "Medium",
-    primaryReason: "Balances harm reduction with due process under ambiguity.",
-    keyTradeoff: "Accepts some operational cost to avoid irreversible enforcement errors.",
-    constraintCheck: [
-      "Hard safety constraint addressed via limited reach and expedited review.",
-      "Strong rights constraint satisfied via clear rationale and appeal pathway."
+    options: [
+      {
+        id: "A",
+        name: "Immediate Full Deployment",
+        description: "Deploy the model as designed, using its full predictive capability in production.",
+        reversibility: "Partially reversible",
+        timeHorizon: "Immediate"
+      },
+      {
+        id: "B",
+        name: "Delay Deployment Until Explainability Improves",
+        description: "Postpone deployment until the model meets higher explainability and documentation standards.",
+        reversibility: "Reversible",
+        timeHorizon: "Short-term"
+      },
+      {
+        id: "C",
+        name: "Limited or Guarded Deployment",
+        description: "Deploy in constrained role: decision support only, human-in-loop for high-impact cases, restricted contexts.",
+        reversibility: "Reversible",
+        timeHorizon: "Immediate / Ongoing monitoring"
+      }
     ],
-    scoreTable: [
-      { optionId: "A", fraudPrevention: 0,  fairness: 70, trust: 55, efficiency: 90, overall: 61 },
-      { optionId: "B", fraudPrevention: 0,  fairness: 45, trust: 50, efficiency: 80, overall: 56 },
-      { optionId: "C", fraudPrevention: 0,  fairness: 75, trust: 75, efficiency: 65, overall: 72 }
+
+    constraints: [
+      {
+        id: "C1",
+        type: "governance",
+        severity: "hard",
+        statement: "Decisions affecting individuals must be explainable and auditable."
+      },
+      {
+        id: "C2",
+        type: "accountability",
+        severity: "strong",
+        statement: "Human oversight required for high-impact automated decisions."
+      },
+      {
+        id: "C3",
+        type: "compliance",
+        severity: "hard",
+        statement: "Deployment must satisfy regulatory explainability requirements."
+      }
     ],
-    explanation:
-      "When signals are ambiguous, immediate removal can create irreversible fairness and credibility failures, while allowing content can expose users to harm. Option C is recommended because it reduces harm through distribution limits and labeling while preserving due process with expedited human review. This keeps decisions explainable and reduces the risk of over-enforcement.",
-    safeguards: [
-      "Route to expedited human review with clear criteria",
-      "Provide the user a specific reason and an appeal path",
-      "Measure false positive/false negative rates for similar content",
-      "Publish consistency guidelines for edge cases"
-    ]
+
+    values: [
+      { id: "V1", name: "Business Value", weight: 0.25, definition: "Delivering measurable operational improvements through AI." },
+      { id: "V2", name: "Governance & Compliance", weight: 0.30, definition: "Meeting regulatory and organizational responsibility standards." },
+      { id: "V3", name: "Explainability", weight: 0.25, definition: "Ability to understand and justify individual model decisions." },
+      { id: "V4", name: "Accountability", weight: 0.20, definition: "Preserving human responsibility for outcomes affecting people." }
+    ],
+
+    evidence: [
+      {
+        id: "S1",
+        description: "Model shows strong aggregate performance in testing/pilot environments.",
+        sourceType: "technical",
+        reliability: "high",
+        direction: "supports deployment"
+      },
+      {
+        id: "S2",
+        description: "Limited individual-level explainability; some feature interactions opaque.",
+        sourceType: "technical",
+        reliability: "high",
+        direction: "supports caution"
+      },
+      {
+        id: "S3",
+        description: "Regulatory scrutiny on AI explainability increasing across jurisdictions.",
+        sourceType: "external",
+        reliability: "medium",
+        direction: "supports governance"
+      }
+    ],
+
+    uncertainty: {
+      level: "Medium-High",
+      unknowns: [
+        "Long-term model drift and performance degradation",
+        "Real-world edge cases not captured in training data",
+        "Regulatory interpretation of 'explainability' requirements"
+      ],
+      riskOfError: [
+        "Unexplained harmful outcomes damaging trust/reputation",
+        "Overly conservative delays missing business opportunities",
+        "Insufficient safeguards leading to compliance failures"
+      ]
+    },
+
+    impact: [
+      {
+        optionId: "A",
+        humanImpact: "Maximizes efficiency gains; risks unexplained harm to affected individuals.",
+        harmTypes: ["explainability", "accountability", "reputation"],
+        reversibilityCost: "High",
+        distributionalEffects: "Harm distributed to downstream users; costs to organization if failures occur."
+      },
+      {
+        optionId: "B",
+        humanImpact: "Preserves safety but delays value realization for stakeholders.",
+        harmTypes: ["opportunity"],
+        reversibilityCost: "Low",
+        distributionalEffects: "Costs borne by continued manual processes."
+      },
+      {
+        optionId: "C",
+        humanImpact: "Delivers value with guardrails; maintains human accountability.",
+        harmTypes: ["operational overhead"],
+        reversibilityCost: "Low",
+        distributionalEffects: "Costs shared between additional oversight and constrained benefits."
+      }
+    ],
+
+    recommendation: {
+      recommendedOptionId: "C",
+      confidence: "High",
+      primaryReason: "Balances business value with governance under explainability limitations.",
+      keyTradeoff: "Accepts operational constraints to preserve accountability and defensibility.",
+      constraintCheck: [
+        "Hard governance constraint satisfied via human-in-loop and documentation.",
+        "Strong accountability constraint met through limited deployment scope."
+      ],
+        scoreTable: [
+{ optionId: "A", efficiency: 90, fairness: 40, trust: 35, trust: 45, overall: 60 },
+{ optionId: "B", efficiency: 30, fairness: 85, trust: 90, trust: 85, overall: 72 },
+{ optionId: "C", efficiency: 70, fairness: 80, trust: 85, trust: 80, overall: 78 }
+      ],
+      explanation:
+        "Immediate full deployment risks regulatory exposure and unexplainable harm despite strong aggregate performance. Delay forfeits value. Limited deployment is recommended as it delivers benefits while embedding governance from day one. Human oversight and constrained scope create a defensible path that builds trust and enables controlled learning.",
+      safeguards: [
+        "Human review for high-impact cases",
+        "Comprehensive logging of inputs/outcomes/overrides",
+        "Defined escalation/rollback criteria",
+        "Periodic model explainability audits and governance reviews"
+      ]
+    }
   }
-}
-
 ];
+
