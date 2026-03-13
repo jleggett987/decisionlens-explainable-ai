@@ -1,4 +1,3 @@
-const scenarios = window.DECISIONLENS_SCENARIOS || [];
 // ai-service.js
 // Main AI service for DecisionLens - integrates scoring, explanation, and data processing
 

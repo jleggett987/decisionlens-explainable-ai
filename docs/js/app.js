@@ -1,12 +1,14 @@
-import { showToast } from '../ui/clipboard.js';
-const scenarios = window.DECISIONLENS_SCENARIOS || [];
-import { goTo, getRoute, onRouteChange } from './router.js';
-import { showView } from './views.js';
 // Simple DOM selector utility
 function $(id) {
   return document.getElementById(id);
 }
 // Global MutationObserver to catch display:none on #aiAnalysisCard
+const $ = (id) => {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing element #${id}`);
+  return el;
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const card = document.getElementById("aiAnalysisCard");
   if (card) {
