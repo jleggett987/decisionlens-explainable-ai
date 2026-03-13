@@ -5,9 +5,9 @@ import {
   renderScenario,
   hideAIAnalysisCard,
   renderAIAnalysisCard
-} from "./render.js";
-import { copyToClipboard, showToast } from "./clipboard.js";
-import { toggleAI, processScenario, updateAIStatus } from "./ai-service.js";
+} from "../ui/render.js";
+import { copyToClipboard, showToast } from "../ui/clipboard.js";
+import { toggleAI, processScenario, updateAIStatus } from "../engine/ai-service.js";
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
