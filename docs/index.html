@@ -337,22 +337,22 @@
   
   <!-- Print styles -->
   <script>
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    // Always use relative path for print.css from docs/
     const printLink = document.createElement('link');
     printLink.rel = 'stylesheet';
-    printLink.href = isLocal ? '../src/ui/print.css' : 'src/ui/print.css';
+    printLink.href = 'js/../ui/print.css';
     document.head.appendChild(printLink);
   </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="data/scenarios.js"></script>
-<script src="js/config.js"></script>
-<script src="js/render.js"></script>
-<script src="js/data-processor.js"></script>
-<script src="js/scoring-engine.js"></script>
-<script src="js/explanation-generator.js"></script>
-<script src="js/ai-service.js"></script>
-<script src="js/app.js"></script>
+<script type="module" src="data/scenarios.js"></script>
+<script type="module" src="js/config.js"></script>
+<script type="module" src="js/render.js"></script>
+<script type="module" src="js/data-processor.js"></script>
+<script type="module" src="js/scoring-engine.js"></script>
+<script type="module" src="js/explanation-generator.js"></script>
+<script type="module" src="js/ai-service.js"></script>
+<script type="module" src="js/app.js"></script>
 
 </body>
 </html>

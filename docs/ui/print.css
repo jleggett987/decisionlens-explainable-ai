@@ -1,0 +1,105 @@
+/* Print-friendly styles for DecisionLens reports */
+
+/* Base print styles */
+@media print {
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: black;
+    background: white;
+    margin: 0;
+    padding: 1in;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+
+  table {
+    page-break-inside: avoid;
+    width: 100%;
+  }
+
+  /* Hide interactive/UI elements */
+  nav, header, footer,
+  button, .btn,
+  [data-view] button,
+  #stepper, #exportBtn, #printBtn, #copySummaryBtn,
+  #aiToggleBtn, #historyBtn,
+  canvas, #scoreRadarChart, #scoreBars,
+  .badge, .pill,
+  .toast,
+  [data-pane] button {
+    display: none !important;
+  }
+
+  /* Show core report content */
+  #viewWalkthrough,
+  [data-pane],
+  #decisionBanner,
+  table#scoreTable {
+    display: block !important;
+  }
+
+  /* Optimize tables */
+  table#scoreTable {
+    border-collapse: collapse;
+    font-size: 11pt;
+  }
+
+  table#scoreTable th,
+  table#scoreTable td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+
+  table#scoreTable th {
+    background: #f0f0f0;
+    font-weight: bold;
+  }
+
+  table#scoreTable tr.highlight-row {
+    font-weight: bold;
+    background: #f9f9f9 !important;
+  }
+
+  /* Lists */
+  ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+  }
+
+  .opt, .card {
+    page-break-inside: avoid;
+    margin-bottom: 1em;
+    border: 1px solid #ddd;
+    padding: 1em;
+    background: white;
+  }
+
+  .top {
+    font-weight: bold;
+  }
+
+  .muted {
+    color: #333;
+    font-style: italic;
+  }
+
+  /* Page breaks */
+  .opt:last-child,
+  table:last-child {
+    page-break-after: avoid;
+  }
+
+  /* Recommendation highlight */
+  #decisionBanner {
+    border: 2px solid #3bb273;
+    background: #f0f8f0;
+    page-break-after: avoid;
+  }
+}
