@@ -189,6 +189,8 @@ DecisionLens focuses on **structured, explainable reasoning rather than opaque o
 
 ![DecisionLens Workflow](docs/workflow-demo.png)
 
+![DecisionLens Chart](docs/demo-radar.png)
+
 ### How DecisionLens Works
 
 DecisionLens models decisions as a structured reasoning process:
