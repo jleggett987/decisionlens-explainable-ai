@@ -1,6 +1,6 @@
 // render.js
 
-import { VALUE_SCORE_KEY_MAP } from "../data/scenarios.js";
+const VALUE_SCORE_KEY_MAP = window.VALUE_SCORE_KEY_MAP || {};
 
 
 const $ = (id) => {
