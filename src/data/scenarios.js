@@ -17,6 +17,8 @@ const VALUE_SCORE_KEY_MAP = {
   "Operational Flow": "efficiency"
 };
 
+window.VALUE_SCORE_KEY_MAP = VALUE_SCORE_KEY_MAP;
+
 window.DECISIONLENS_SCENARIOS = [
   {
     id: "fraud_access_001",
@@ -458,5 +460,3 @@ window.DECISIONLENS_SCENARIOS = [
 }
 
 ];
-export { VALUE_SCORE_KEY_MAP };
-export default window.DECISIONLENS_SCENARIOS;

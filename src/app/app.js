@@ -8,10 +8,10 @@ import {
 } from "../ui/render.js";
 import { copyToClipboard, showToast } from "../ui/clipboard.js";
 import { toggleAI, processScenario, updateAIStatus } from "../engine/ai-service.js";
-import { VALUE_SCORE_KEY_MAP } from "../data/scenarios.js";
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
+const VALUE_SCORE_KEY_MAP = window.VALUE_SCORE_KEY_MAP || {};
 
 const WORKFLOW = [
   {
