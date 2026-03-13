@@ -1,8 +1,7 @@
-// clipboard.js
-const $ = (id) => document.getElementById(id);
+
 
 export function showToast(msg) {
-  const t = $("toast");
+  const t = document.getElementById("toast");
   if (!t) return;
   t.textContent = msg;
   t.classList.add("show");
