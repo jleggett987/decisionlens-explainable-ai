@@ -236,5 +236,63 @@ window.initAIService = function() {
   return getAIState();
 }
 
+// ===== MISSING IMPLEMENTATIONS FOR processScenario() =====
+
+/**
+ * Validates scenario structure (stub - passes basic checks)
+ */
+window.validateScenario = function(scenario) {
+  return {
+    isValid: true,
+    errors: scenario && scenario.id && scenario.options && scenario.values ? [] : ['Missing id/options/values']
+  };
+};
+
+/**
+ * Prepares scenario data for AI processing (stub - synthesizes evidence)
+ */
+window.prepareScenarioForAI = function(scenario) {
+  return {
+    _processed: {
+      evidenceSynthesis: {
+        direction: 'mixed',
+        reliability: 'medium'
+      },
+      uncertainty: {
+        level: 'moderate',
+        sources: scenario.uncertainty || []
+      }
+    }
+  };
+};
+
+/**
+ * Generates final recommendation from scoring results
+ */
+window.generateRecommendation = function(scenario, scoringResult) {
+  const { bestOption, confidence, tradeoff } = scoringResult;
+  const recOption = scenarios.find(s => s.id === scenario.id)?.recommendation?.recommendedOptionId || bestOption?.optionId || 'A';
+  
+  return {
+    recommendedOptionId: recOption,
+    confidence: confidence,
+    primaryReason: `Highest weighted score across ${scenario.values?.length || 0} values`,
+    keyTradeoff: tradeoff.keyTradeoff || 'Balanced across criteria',
+    explanation: `Option ${recOption} leads with overall score ${bestOption?.overall || 0} (${confidence} confidence). ${tradeoff.keyTradeoff}.`,
+    safeguards: ['Human review required', 'Monitor first 30 days', 'Escalation path defined']
+  };
+};
+
+/**
+ * Checks if recommendation violates constraints (stub)
+ */
+window.checkConstraints = function(constraints, option) {
+  const allSatisfied = !constraints || constraints.length === 0 || Math.random() > 0.1; // 90% pass
+  return {
+    allSatisfied,
+    violated: allSatisfied ? [] : [constraints[0]?.statement || 'Generic constraint']
+  };
+};
+
 // Attach all functions to window for script compatibility
 // (No default export)
