@@ -67,6 +67,75 @@ Users can explore how DecisionLens evaluates complex decisions and understand th
 
 ---
 
+## Technical Highlights
+
+DecisionLens demonstrates several technical capabilities relevant to modern AI, product engineering, and decision-support systems.
+
+**Explainable Decision Intelligence**
+
+Implements a transparent decision engine that evaluates competing options using weighted multi-criteria scoring rather than opaque black-box models.
+
+**Structured Scenario Modeling**
+
+Complex decisions are modeled using structured scenario definitions including:
+
+• options  
+• constraints  
+• competing values  
+• evidence signals  
+• uncertainty factors  
+• human impact analysis  
+
+This allows decisions to be evaluated systematically and reproducibly.
+
+**Multi-Criteria Scoring Engine**
+
+A deterministic scoring engine evaluates options across weighted value dimensions such as:
+
+• risk mitigation  
+• fairness  
+• operational efficiency  
+• trust and transparency  
+
+Scores are aggregated to produce a defensible recommendation.
+
+**Explainability Layer**
+
+DecisionLens generates structured explanations including:
+
+• primary reasoning  
+• key tradeoffs  
+• constraint validation  
+• safeguard recommendations  
+
+This ensures recommendations remain auditable and understandable.
+
+**Interactive Decision Visualization**
+
+The demo application provides a browser-based interface that allows users to:
+
+• explore decision scenarios  
+• compare option impacts  
+• visualize scoring outcomes  
+• walk through the reasoning process step-by-step
+
+**Sensitivity Analysis**
+
+The system can evaluate how sensitive recommendations are to changes in decision priorities, helping decision makers understand how robust a recommendation is under different assumptions.
+
+**Optional AI-Assisted Analysis**
+
+An AI-assisted mode can generate additional reasoning and analysis on top of the deterministic decision engine, allowing users to compare static and AI-generated recommendations.
+
+---
+
+### Technologies Used
+
+• JavaScript (ES Modules)  
+• Browser-based UI architecture  
+• Structured decision modeling  
+• Multi-criteria decision analysis (MCDA)  
+• Explainable AI design principles  
 # The Problem
 
 Organizations face complex decisions every day:
@@ -335,6 +404,7 @@ https://linkedin.com/in/jasonleggett
 # License
 
 MIT License
+
 
 
 
