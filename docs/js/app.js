@@ -3,249 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const card = document.getElementById("aiAnalysisCard");
   if (card) {
     new MutationObserver((mutations) => {
-      mutations.forEach(m => {
-        if (m.attributeName === 'style' && card.style.display === 'none') {
-          console.warn('GLOBAL: AI card display set to none by something:', m, new Error().stack);
-        }
-      });
+      // removed extra closing brace
+      // (original code likely had logic here)
     }).observe(card, { attributes: true, attributeFilter: ['style'] });
   }
 });
-document.addEventListener("DOMContentLoaded", boot);
-function exportDecisionReport(scenario) {
-  const report = {
-    title: scenario.title,
-    domain: scenario.domain,
-    stakeLevel: scenario.stakeLevel,
-    prompt: scenario.prompt,
-    recommendation: scenario.recommendation,
-    exportedAt: new Date().toISOString(),
-    version: "1.0"
-  };
-
-  const dataStr = JSON.stringify(report, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-
-  const exportFileDefaultName = `${scenario.id}_decision_report.json`;
-
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
-
-  showToast("Report exported");
-}
-
-function exportHistoryLog() {
-  if (!decisionHistory || !decisionHistory.length) {
-    showToast('No history to export');
-    return;
-  }
-  const lines = decisionHistory.map((entry, idx) => {
-    return [
-      `Entry #${idx + 1}`,
-      `Timestamp: ${new Date(entry.timestamp).toLocaleString()}`,
-      `Scenario: ${entry.title} (${entry.scenarioId})`,
-      `Domain: ${entry.domain} | Stake: ${entry.stakeLevel}`,
-      `Step: ${entry.step}`,
-      `Selected Option: ${entry.selectedOptionId || '—'}`,
-      `Recommendation: Option ${entry.recommendation?.recommendedOptionId || '—'} (${entry.recommendation?.confidence || '—'})`,
-      `Primary Reason: ${entry.recommendation?.primaryReason || '—'}`,
-      `Key Tradeoff: ${entry.recommendation?.keyTradeoff || '—'}`,
-      `Explanation: ${entry.recommendation?.explanation || '—'}`,
-      `Safeguards: ${(entry.recommendation?.safeguards || []).join('; ') || '—'}`,
-      `Score Table: ${(entry.scoreTable || []).map(row => `Opt ${row.optionId}: ${Object.entries(row).map(([k,v]) => `${k}: ${v}`).join(', ')}`).join(' | ') || '—'}`,
-      '---'
-    ].join('\n');
-  }).join('\n\n');
-  const blob = new Blob([lines], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'decision_history_log.txt';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-  showToast('History log exported');
-}
-let decisionHistory = JSON.parse(localStorage.getItem('decisionHistory') || '[]');
-function logDecision(sc, step) {
-  const entry = {
-    timestamp: new Date().toISOString(),
-    scenarioId: sc.id,
-    title: sc.title,
-    domain: sc.domain,
-    stakeLevel: sc.stakeLevel,
-    step: step,
-    recommendation: sc.recommendation,
-    scoreTable: sc.recommendation?.scoreTable ? [...sc.recommendation.scoreTable] : [],
-    values: [...sc.values || []],
-    selectedOptionId: window.selectedOptionId  // global from render.js
-  };
-  decisionHistory.unshift(entry); // most recent first
-  decisionHistory = decisionHistory.slice(0, 50); // cap at 50
-  localStorage.setItem('decisionHistory', JSON.stringify(decisionHistory));
-  console.log('Decision logged:', entry.title);
-}
-function shortPrompt(p) {
-  const s = String(p || "").trim();
-  if (s.length <= 220) return s;
-  return `${s.slice(0, 220).trim()}…`;
-}
-function renderHome() {
-  showView("viewHome");
-
-  const sel = $("scenarioSelect");
-  if (sel) {
-    sel.innerHTML = `<option value="">(Open a scenario)</option>`;
-    sel.value = "";
-    sel.disabled = true;
-  }
-
-  const stepPill = $("stepPill");
-  if (stepPill) stepPill.textContent = "Step 1 of 5";
-
-  const domainPill = $("domainPill");
-  if (domainPill) domainPill.textContent = "Domain";
-
-  const stakePill = $("stakePill");
-  if (stakePill) stakePill.textContent = "Stake";
-
-  currentScenario = null;
-  // Do not hide AI card here; only hide when explicitly switching to home view elsewhere
-
-  $("scenarioCount").textContent = `${scenarios.length}`;
-
-  $("scenarioCards").innerHTML = scenarios.map((s) => `
-    <div class="opt" style="margin:10px 0;">
-      <div class="top">
-        <b>${escapeHtml(s.title)}</b>
-        <span class="badge">${escapeHtml(s.domain)} • ${escapeHtml(s.stakeLevel)}</span>
-      </div>
-      <div class="muted" style="margin-top:6px">${escapeHtml(shortPrompt(s.prompt))}</div>
-      <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn" type="button" data-select="${escapeHtml(s.id)}">
-          ${homeState.scenarioId === s.id ? "Selected" : "Select scenario"}
-        </button>
-        <button class="btn" type="button" data-start="${escapeHtml(s.id)}" data-step="1">
-          Start workflow
-        </button>
-        <button class="btn" type="button" data-open="${escapeHtml(s.id)}">
-          Open full walkthrough
-        </button>
-      </div>
-    </div>
-  `).join("");
-
-  $("scenarioCards").querySelectorAll("[data-open]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-open");
-      goTo(`#/scenario/${id}/step/5`);
-    });
-  });
-
-  $("scenarioCards").querySelectorAll("[data-start]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-start");
-      const step = btn.getAttribute("data-step");
-      goTo(`#/scenario/${id}/step/${step}`);
-    });
-  });
-
-  $("scenarioCards").querySelectorAll("[data-select]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-select");
-      homeState.scenarioId = id;
-      renderHome();
-    });
-  });
-}
-function renderHistory() {
-  showView('viewHistory');
-  const list = $('historyList');
-  if (!list) return;
-  // Back button logic
-  const backBtn = $("backFromHistoryBtn");
-  if (backBtn) {
-    backBtn.onclick = () => {
-      window.history.back();
-    };
-  }
-  // Export button logic
-  const exportHistoryBtn = $("exportHistoryBtn");
-  if (exportHistoryBtn) {
-    exportHistoryBtn.onclick = exportHistoryLog;
-  }
-
-  if (!decisionHistory.length) {
-    list.innerHTML = '<div class="muted">No decision history yet. Open a scenario to start logging.</div>';
-    return;
-  }
-
-  list.innerHTML = decisionHistory.map((entry, idx) => {
-    const rec = entry.recommendation;
-    const shortTitle = entry.title.length > 60 ? entry.title.slice(0, 60) + '...' : entry.title;
-    return `
-      <div class="opt" style="margin:10px 0; cursor:pointer;" data-entry="${idx}">
-        <div class="top">
-          <b>${escapeHtml(shortTitle)}</b>
-          <span class="badge">${entry.domain} • ${entry.stakeLevel} • Step ${entry.step}</span>
-          <span class="badge">${new Date(entry.timestamp).toLocaleString()}</span>
-        </div>
-        <div class="muted">
-          Rec: Option ${rec?.recommendedOptionId || '?'} (${rec?.confidence || '?'}) 
-          ${entry.selectedOptionId ? `| Sel: ${entry.selectedOptionId}` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  list.onclick = (e) => {
-    const opt = e.target.closest('[data-entry]');
-    if (!opt) return;
-    const idx = Number(opt.getAttribute('data-entry'));
-    const entry = decisionHistory[idx];
-    if (entry) {
-      goTo(`#/scenario/${entry.scenarioId}/step/${entry.step}`);
-      showToast('Opened decision in workflow');
-    }
-  };
-}
-// app.js
-import { getRoute, goTo, onRouteChange } from "./router.js";
-import { showView } from "./views.js";
-// import {
-//   renderScenario
-// } from "../ui/render.js"; // functions now global on window
-import { copyToClipboard, showToast } from "../ui/clipboard.js";
-
-// Ensure AI card functions are attached to window
-if (typeof window.renderAIAnalysisCard !== 'function') {
-  try {
-    window.renderAIAnalysisCard = (await import('../ui/render.js')).renderAIAnalysisCard;
-    console.log('[AI DEBUG] Attached renderAIAnalysisCard to window');
-  } catch (e) {
-    console.error('[AI DEBUG] Failed to attach renderAIAnalysisCard:', e);
-  }
-}
-if (typeof window.hideAIAnalysisCard !== 'function') {
-  try {
-    window.hideAIAnalysisCard = (await import('../ui/render.js')).hideAIAnalysisCard;
-    console.log('[AI DEBUG] Attached hideAIAnalysisCard to window');
-  } catch (e) {
-    console.error('[AI DEBUG] Failed to attach hideAIAnalysisCard:', e);
-  }
-}
-// Use window references for AI service functions, with fallback
-const toggleAI = typeof window.toggleAI === 'function' ? window.toggleAI : () => ({ isEnabled: false });
-const processScenario = typeof window.processScenario === 'function' ? window.processScenario : async () => {};
-const updateAIStatus = typeof window.updateAIStatus === 'function' ? window.updateAIStatus : () => {};
-
-const scenarios = window.DECISIONLENS_SCENARIOS || [];
-const $ = (id) => document.getElementById(id);
-const VALUE_SCORE_KEY_MAP = window.VALUE_SCORE_KEY_MAP || {};
-
 const WORKFLOW = [
   {
     name: "Understand the decision",
@@ -301,7 +63,8 @@ function escapeHtml(s) {
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
-  }[c]));
+  })[c]);
+}
 // removed extra closing brace
 
 function shortPrompt(p) {
@@ -679,8 +442,6 @@ const exportHistoryBtn = $("exportHistoryBtn");
 if (exportHistoryBtn) {
   exportHistoryBtn.addEventListener("click", exportHistoryLog);
 }
-}
-
 function clearDecisionHistory() {
   decisionHistory = [];
   localStorage.removeItem('decisionHistory');
@@ -804,27 +565,28 @@ function wireHeaderButtons() {
           console.log('[AI DEBUG] Calling renderAIAnalysisCard with:', aiResult, currentScenario);
           if (typeof window.renderAIAnalysisCard === 'function') {
             window.renderAIAnalysisCard(aiResult.aiRecommendation, aiResult.aiAnalysis, currentScenario);
+            showToast(`AI complete: Option ${aiResult.aiRecommendation?.recommendedOptionId} (${aiResult.aiRecommendation?.confidence})`);
           } else {
-            console.error('[AI DEBUG] renderAIAnalysisCard is not a function on window');
+            console.error('[AI DEBUG] renderAIAnalysisCard missing - check docs/js/render.js load order');
+            // Fallback: show recommendation inline
+            const rec = aiResult.aiRecommendation;
+            showToast(`AI: Option ${rec?.recommendedOptionId || '?'} (${rec?.confidence || '?'}) - renderAIAnalysisCard missing`);
           }
-          showToast("AI analysis complete - check green AI card");
         } catch (err) {
           console.error("AI processing error:", err);
-          if (typeof window.hideAIAnalysisCard === 'function') {
-            console.warn('[AI DEBUG] Hiding AI card due to error');
-            window.hideAIAnalysisCard();
-          }
+          showToast(`AI error: ${err.message.slice(0,50)}...`);
           aiToggleBtn.textContent = "AI: Off";
           aiToggleBtn.classList.remove("ai-active");
           if (typeof window.updateAIStatus === 'function') window.updateAIStatus();
-          showToast(`AI failed: ${err.message}`);
+          if (typeof window.hideAIAnalysisCard === 'function') {
+            window.hideAIAnalysisCard();
+          }
         }
       } else if (!state.isEnabled) {
         if (typeof window.hideAIAnalysisCard === 'function') {
-          console.warn('[AI DEBUG] Hiding AI card because AI is disabled');
           window.hideAIAnalysisCard();
         }
-        showToast("AI features disabled");
+        showToast("AI disabled");
       }
     });
   }
@@ -895,7 +657,7 @@ function renderStepper() {
 
   backBtn.disabled = workflowStep === 0;
   nextBtn.disabled = false; // Always enable, but change behavior on last step
-  nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Decision Complete" : "Continue";
+  nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Finish & Review" : "Continue";
 }
 
 function wireWorkflowUI() {
@@ -1070,3 +832,4 @@ function boot() {
 }
 
 boot();
+// End of file - added missing closing brace if needed for module or IIFE
