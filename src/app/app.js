@@ -8,6 +8,7 @@ import {
 } from "../ui/render.js";
 import { copyToClipboard, showToast } from "../ui/clipboard.js";
 import { toggleAI, processScenario, updateAIStatus } from "../engine/ai-service.js";
+import { VALUE_SCORE_KEY_MAP } from "../data/scenarios.js";
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
@@ -50,22 +51,6 @@ const WORKFLOW = [
     ]
   }
 ];
-
-const VALUE_SCORE_KEY_MAP = {
-  "Fraud Prevention": "fraudPrevention",
-  "Patient Safety": "fraudPrevention",
-  "Harm Reduction": "fraudPrevention",
-
-  "User Access & Fairness": "fairness",
-  "Fair Access": "fairness",
-  "Fairness & Due Process": "fairness",
-
-  "Trust & Transparency": "trust",
-  "Trust & Legibility": "trust",
-
-  "Operational Efficiency": "efficiency",
-  "Operational Flow": "efficiency"
-};
 
 let workflowStep = 0;
 let currentScenario = null;
@@ -121,6 +106,30 @@ function buildCopySummary(sc, forcedOptionId = null) {
   lines.push(rec.explanation || "—");
 
   return lines.join("\n");
+}
+
+function exportDecisionReport(scenario) {
+  const report = {
+    title: scenario.title,
+    domain: scenario.domain,
+    stakeLevel: scenario.stakeLevel,
+    prompt: scenario.prompt,
+    recommendation: scenario.recommendation,
+    exportedAt: new Date().toISOString(),
+    version: "1.0"
+  };
+
+  const dataStr = JSON.stringify(report, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+
+  const exportFileDefaultName = `${scenario.id}_decision_report.json`;
+
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+
+  showToast("Report exported");
 }
 
 function setHomeScenario(id) {
@@ -410,6 +419,17 @@ function wireHeaderButtons() {
     });
   }
 
+  const exportBtn = $("exportBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      if (!currentScenario) {
+        showToast("Open a scenario first");
+        return;
+      }
+      exportDecisionReport(currentScenario);
+    });
+  }
+
   const aiToggleBtn = $("aiToggleBtn");
   if (aiToggleBtn) {
     aiToggleBtn.addEventListener("click", async () => {
@@ -429,7 +449,6 @@ function wireHeaderButtons() {
       if (state.isEnabled && currentScenario) {
         try {
           const aiResult = await processScenario(currentScenario);
-          console.log("AI Analysis complete:", aiResult.aiRecommendation);
           renderAIAnalysisCard(aiResult.aiRecommendation, aiResult.aiAnalysis, currentScenario);
           showToast("AI analysis complete");
         } catch (err) {

@@ -119,6 +119,38 @@ The demo application provides a browser-based interface that allows users to:
 • visualize scoring outcomes  
 • walk through the reasoning process step-by-step
 
+---
+
+## Technical Architecture
+
+DecisionLens is built with a modular, vanilla JavaScript architecture for maximum portability and maintainability:
+
+```
+src/
+├── app/           # Application logic and routing
+│   ├── app.js     # Main app controller
+│   ├── router.js  # Client-side routing
+│   └── views.js   # View management
+├── engine/        # AI and decision logic
+│   ├── ai-service.js         # AI processing orchestration
+│   ├── scoring-engine.js     # Weighted scoring algorithms
+│   ├── explanation-generator.js # Natural language explanations
+│   └── data-processor.js     # Data validation and synthesis
+├── ui/            # User interface components
+│   ├── render.js  # DOM rendering utilities
+│   └── clipboard.js # Copy/share functionality
+└── data/          # Scenario data and configurations
+    └── scenarios.js # Decision scenarios and mappings
+```
+
+Key design principles:
+- **ES6 Modules**: Clean imports/exports for modularity
+- **Deterministic Scoring**: Reproducible results without ML black boxes
+- **Browser-Native**: No build tools or frameworks required
+- **Explainable by Design**: Every recommendation includes reasoning
+
+---
+
 **Sensitivity Analysis**
 
 The system can evaluate how sensitive recommendations are to changes in decision priorities, helping decision makers understand how robust a recommendation is under different assumptions.

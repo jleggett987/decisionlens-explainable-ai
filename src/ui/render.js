@@ -1,25 +1,14 @@
 // render.js
 
-const VALUE_SCORE_KEY_MAP = {
-  "Fraud Prevention": "fraudPrevention",
-  "Patient Safety": "fraudPrevention", // reused column
-  "Harm Reduction": "fraudPrevention",
-
-  "User Access & Fairness": "fairness",
-  "Fair Access": "fairness",
-  "Fairness & Due Process": "fairness",
-
-  "Trust & Transparency": "trust",
-  "Trust & Legibility": "trust",
-
-  "Operational Efficiency": "efficiency",
-  "Operational Flow": "efficiency"
-};
+import { VALUE_SCORE_KEY_MAP } from "../data/scenarios.js";
 
 
 const $ = (id) => {
   const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing element #${id} in index.html`);
+  if (!el) {
+    console.warn(`Element #${id} not found`);
+    return null;
+  }
   return el;
 };
 

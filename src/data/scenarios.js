@@ -1,6 +1,22 @@
 // scenarios.js
 // Read-only scenario data. Add more scenarios by copying the object structure.
 
+const VALUE_SCORE_KEY_MAP = {
+  "Fraud Prevention": "fraudPrevention",
+  "Patient Safety": "fraudPrevention", // reused column
+  "Harm Reduction": "fraudPrevention",
+
+  "User Access & Fairness": "fairness",
+  "Fair Access": "fairness",
+  "Fairness & Due Process": "fairness",
+
+  "Trust & Transparency": "trust",
+  "Trust & Legibility": "trust",
+
+  "Operational Efficiency": "efficiency",
+  "Operational Flow": "efficiency"
+};
+
 window.DECISIONLENS_SCENARIOS = [
   {
     id: "fraud_access_001",
@@ -442,3 +458,5 @@ window.DECISIONLENS_SCENARIOS = [
 }
 
 ];
+export { VALUE_SCORE_KEY_MAP };
+export default window.DECISIONLENS_SCENARIOS;

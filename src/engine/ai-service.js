@@ -50,7 +50,7 @@ export function updateAIStatus() {
   const statusEl = document.getElementById('aiStatus');
   if (statusEl) {
     if (AI_STATE.isProcessing) {
-      statusEl.textContent = 'Processing...';
+      statusEl.innerHTML = '<span class="spinner"></span>Processing...';
       statusEl.className = 'pill ai-processing';
     } else if (AI_STATE.isEnabled) {
       statusEl.textContent = 'AI Enabled';
@@ -217,7 +217,6 @@ export function initAIService() {
     setAIEnabled(true);
   }
 
-  console.log('AI Service initialized', getAIState());
   return getAIState();
 }
 
