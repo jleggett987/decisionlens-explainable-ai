@@ -1,3 +1,6 @@
+import { goTo, getRoute, onRouteChange } from '../router.js';
+import { showView } from '../views.js';
+import { showToast } from '../../ui/clipboard.js';
 // Simple DOM selector utility (throws if not found)
 const $ = (id) => {
   const el = document.getElementById(id);
