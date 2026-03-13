@@ -423,6 +423,16 @@ As AI systems increasingly influence high-stakes decisions, tools like DecisionL
 
 ---
 
+## Accessibility
+
+DecisionLens is designed with accessibility and inclusive usability in mind, including:
+
+• keyboard navigation support  
+• skip links and semantic landmarks  
+• ARIA live regions for dynamic updates  
+• accessible heading structure  
+• chart and visualization labeling  
+• visible focus states
 # Author
 
 Jason Leggett  
@@ -436,6 +446,7 @@ https://linkedin.com/in/jasonleggett
 # License
 
 MIT License
+
 
 
 
