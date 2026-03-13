@@ -104,7 +104,11 @@
     .ai-enabled { background: #d4f7d4; color: #1a5c1a; border-color: #b8e6b8; }
     .ai-processing { background: #fff3cd; color: #856404; border-color: #ffeeba; }
     #aiToggleBtn { font-weight: 500; }
-    #aiToggleBtn.ai-active { background: #e8f5e9; border-color: #4caf50; }
+    #aiToggleBtn.ai-active {
+      background: #4caf50 !important;
+      color: #fff !important;
+      border-color: #388e3c !important;
+    }
 
   </style>
 </head>
@@ -210,29 +214,31 @@
         </div>
       </section>
 
-      <div class="grid">
-            <section class="card" id="aiAnalysisCard" style="display:none; border-left: 4px solid #4CAF50;">
-              <div class="recTitle">
-                <strong>AI Analysis</strong>
-                <span class="badge" style="background:#4CAF50">AI</span>
-              </div>
-              <div class="kvs">
-                <div><b>Recommended Option:</b> <span id="aiOption"></span></div>
-                <div><b>Confidence:</b> <span id="aiConfidence"></span></div>
-              </div>
-              <div style="margin-top:10px">
-                <div class="small"><b>Primary Reason</b></div>
-                <div class="muted" id="aiPrimaryReason"></div>
-              </div>
-              <div style="margin-top:10px">
-                <div class="small"><b>Key Tradeoff</b></div>
-                <div class="muted" id="aiTradeoff"></div>
-              </div>
-            </section>
 
-          <h2 id="decision-prompt-heading">Decision prompt</h2>
-          <p class="muted" id="prompt" aria-live="polite"></p>
-        </section>
+      <!-- AI Analysis Card moved to top level inside #viewWalkthrough to ensure visibility -->
+      <section class="card ai-analysis-card" id="aiAnalysisCard" style="display:none; border-left: 4px solid #4CAF50; z-index: 2; margin-bottom: 14px;">
+        <div class="recTitle">
+          <strong>AI Analysis</strong>
+          <span class="badge" style="background:#4CAF50">AI</span>
+        </div>
+        <div class="kvs">
+          <div><b>Recommended Option:</b> <span id="aiOption"></span></div>
+          <div><b>Confidence:</b> <span id="aiConfidence"></span></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="small"><b>Primary Reason</b></div>
+          <div class="muted" id="aiPrimaryReason"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="small"><b>Key Tradeoff</b></div>
+          <div class="muted" id="aiTradeoff"></div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <h2 id="decision-prompt-heading">Decision prompt</h2>
+        <p class="muted" id="prompt" aria-live="polite"></p>
+      </div>
 
         <aside class="card rec" id="recCard" data-pane="recommendation" aria-labelledby="recommendation-heading">
           <div class="recTitle">
@@ -338,29 +344,15 @@
     document.head.appendChild(printLink);
   </script>
 
-  <script>
-    // Dual script loading for local and GitHub Pages
-    const scriptPaths = [
-      isLocal ? '../src/config.js' : 'src/config.js',
-      isLocal ? '../src/data/scenarios.js' : 'src/data/scenarios.js',
-      isLocal ? '../src/engine/ai-service.js' : 'src/engine/ai-service.js',
-      isLocal ? '../src/engine/data-processor.js' : 'src/engine/data-processor.js',
-      isLocal ? '../src/engine/scoring-engine.js' : 'src/engine/scoring-engine.js',
-      isLocal ? '../src/engine/explanation-generator.js' : 'src/engine/explanation-generator.js',
-      isLocal ? '../src/ui/render.js' : 'src/ui/render.js'
-    ];
-    scriptPaths.forEach(path => {
-      const s = document.createElement('script');
-      s.src = path;
-      document.body.appendChild(s);
-    });
-    // Module script for app.js
-    const appScript = document.createElement('script');
-    appScript.type = 'module';
-    appScript.src = isLocal ? '../src/app/app.js' : 'src/app/app.js';
-    document.body.appendChild(appScript);
-  </script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../src/data/scenarios.js"></script>
+<script src="../src/config.js"></script>
+<script src="../src/ui/render.js"></script>
+<script src="../src/engine/data-processor.js"></script>
+<script src="../src/engine/scoring-engine.js"></script>
+<script src="../src/engine/explanation-generator.js"></script>
+<script src="../src/engine/ai-service.js"></script>
+<script type="module" src="../src/app/app.js"></script>
 
 </body>
 </html>

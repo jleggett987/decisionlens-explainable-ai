@@ -274,32 +274,86 @@ function updateSelectionVisibility() {
 }
 
 window.hideAIAnalysisCard = function() {
+  console.trace('hideAIAnalysisCard called');
   const card = document.getElementById("aiAnalysisCard");
-  if (card) card.style.display = "none";
+  if (card) {
+    card.style.display = "none";
+    card.style.removeProperty('!important');
+  }
 }
 
 window.renderAIAnalysisCard = function(aiRecommendation, aiAnalysis, currentScenario) {
+  console.log('renderAIAnalysisCard called with:', {aiRecommendation, aiAnalysis});
   const card = document.getElementById("aiAnalysisCard");
-  if (!card || !aiRecommendation || !aiAnalysis) {
-    window.hideAIAnalysisCard();
+  if (!card) {
+    console.log('No #aiAnalysisCard element found');
+    return;
+  }
+  if (!aiRecommendation || !aiAnalysis) {
+    console.log('Not rendering card - missing aiRecommendation or aiAnalysis');
     return;
   }
 
-  card.style.display = "";
+  // Diagnostic: MutationObserver to log display changes
+  if (!card._displayObserver) {
+    card._displayObserver = new MutationObserver((mutations) => {
+      mutations.forEach(m => {
+        if (m.attributeName === 'style') {
+          const disp = card.style.display;
+          if (disp === 'none') {
+            console.warn('AI card display set to none by something:', m);
+          }
+        }
+      });
+    });
+    card._displayObserver.observe(card, { attributes: true, attributeFilter: ['style'] });
+  }
+
+  // Force show with multiple methods
+  card.style.setProperty('display', 'block', 'important');
+  card.style.setProperty('visibility', 'visible', 'important');
+  card.style.setProperty('opacity', '1', 'important');
+  card.style.setProperty('height', 'auto', 'important');
+  card.style.setProperty('min-height', 'auto', 'important');
+  card.style.setProperty('max-height', 'none', 'important');
+  card.style.setProperty('overflow', 'visible', 'important');
+  card.style.setProperty('position', 'relative', 'important');
+  card.style.setProperty('z-index', '10', 'important');
+  card.classList.remove('hidden', 'd-none', 'collapse');
+  card.removeAttribute('hidden');
+  card.hidden = false;
+
+  // Scroll to card
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   const optionId = aiRecommendation.recommendedOptionId;
   let optionName = `Option ${optionId}`;
-  
   if (currentScenario?.options) {
     const option = currentScenario.options.find(o => o.id === optionId);
     if (option) optionName = option.name || `Option ${optionId}`;
   }
 
-  document.getElementById("aiOption").textContent = optionName;
-  document.getElementById("aiConfidence").textContent = 
-    `${Math.round((aiRecommendation.confidence || 0) * 100)}%`;
-  document.getElementById("aiPrimaryReason").textContent = 
-    aiRecommendation.reasoning || aiRecommendation.explanation || "Analysis complete.";
-  document.getElementById("aiTradeoff").textContent = 
-    aiAnalysis.scoring?.tradeoff?.description || "Balances multiple constraints and values.";
+  const aiOptionEl = document.getElementById("aiOption");
+  if (aiOptionEl) aiOptionEl.textContent = optionName;
+
+  const aiConfEl = document.getElementById("aiConfidence");
+  // Show confidence as a string if not a number, else as a percent
+  let conf = aiRecommendation.confidence;
+  if (typeof conf === 'number' && !isNaN(conf)) {
+    aiConfEl.textContent = `${Math.round(conf * 100)}%`;
+  } else if (typeof conf === 'string') {
+    aiConfEl.textContent = conf;
+  } else {
+    aiConfEl.textContent = '';
+  }
+
+  const aiReasonEl = document.getElementById("aiPrimaryReason");
+  if (aiReasonEl) aiReasonEl.textContent = 
+    aiRecommendation.reasoning || aiRecommendation.explanation || aiRecommendation.primaryReason || "Analysis complete.";
+
+  const aiTradeEl = document.getElementById("aiTradeoff");
+  if (aiTradeEl) aiTradeEl.textContent = 
+    aiAnalysis.scoring?.tradeoff?.description || aiAnalysis.scoring?.tradeoff?.keyTradeoff || aiRecommendation.keyTradeoff || "Balances multiple constraints and values.";
+    
+  console.log('AI card forced visible, computed style:', window.getComputedStyle(card).display, 'offsetHeight:', card.offsetHeight);
 }

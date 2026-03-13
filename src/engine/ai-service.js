@@ -74,30 +74,43 @@ window.processScenario = async function(scenario) {
   updateAIStatus();
 
   try {
+    console.log('AI processScenario started for scenario:', scenario.id);
+
     // Validate input
-    const validation = validateScenario(scenario);
+    const validation = window.validateScenario(scenario);
+
     if (!validation.isValid) {
       console.warn('Scenario validation:', validation.errors);
     }
 
-    // Process data
-    const processedScenario = prepareScenarioForAI(scenario);
+
+    // Process data and retain all scenario properties
+    const processedScenario = {
+      ...scenario,
+      ...window.prepareScenarioForAI(scenario)
+    };
 
     // Generate scores
-    const scoreTable = generateOptionScores(scenario);
-    
+    const scoreTable = window.generateOptionScores(processedScenario);
+    console.log('Generated scoreTable:', scoreTable);
+
+
     // Analyze scores
-    const bestOption = findBestOption(scoreTable);
-    const confidence = calculateConfidence(scoreTable);
-    const tradeoff = analyzeTradeoffs(scoreTable, scenario.values);
+    const bestOption = window.findBestOption(scoreTable);
+    const confidence = window.calculateConfidence(scoreTable);
+    const tradeoff = window.analyzeTradeoffs(scoreTable, processedScenario.values);
+    console.log('Analysis:', {bestOption, confidence, tradeoff});
+
 
     // Generate recommendation
     const scoringResult = { scoreTable, bestOption, confidence, tradeoff };
-    const recommendation = generateRecommendation(scenario, scoringResult);
+    const recommendation = window.generateRecommendation(processedScenario, scoringResult);
+    console.log('Generated recommendation:', recommendation);
+
 
     // Check constraints
-    const recommendedOption = scenario.options?.find(o => o.id === recommendation.recommendedOptionId);
-    const constraintCheckResult = checkConstraints(scenario.constraints, recommendedOption);
+    const recommendedOption = processedScenario.options?.find(o => o.id === recommendation.recommendedOptionId);
+    const constraintCheckResult = window.checkConstraints(processedScenario.constraints, recommendedOption);
 
     // Create final result
     const result = {
@@ -110,8 +123,8 @@ window.processScenario = async function(scenario) {
           confidence,
           tradeoff
         },
-        evidence: processedScenario._processed.evidenceSynthesis,
-        uncertainty: processedScenario._processed.uncertainty,
+        evidence: processedScenario._processed?.evidenceSynthesis,
+        uncertainty: processedScenario._processed?.uncertainty,
         constraints: constraintCheckResult
       },
       aiGenerated: true,
@@ -119,9 +132,7 @@ window.processScenario = async function(scenario) {
     };
 
     AI_STATE.lastProcessed = result;
-    
     return result;
-
   } catch (error) {
     console.error('AI processing error:', error);
     throw error;
@@ -200,6 +211,7 @@ window.getAISummary = function(aiResult) {
  */
 window.toggleAI = function() {
   AI_STATE.isEnabled = !AI_STATE.isEnabled;
+  console.log('[AI DEBUG] toggleAI called. New isEnabled:', AI_STATE.isEnabled, new Error().stack);
   if (typeof window.updateAIStatus === 'function') {
     window.updateAIStatus();
   }

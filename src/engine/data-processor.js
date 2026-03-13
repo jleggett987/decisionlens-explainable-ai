@@ -385,6 +385,8 @@ window.prepareScenarioForAI = function(scenario) {
     }
   };
 }
+  window.prepareScenarioForAI = prepareScenarioForAI;
+  window.checkConstraints = checkConstraints;
 
 // No default export. All functions are attached to window for browser compatibility.
 

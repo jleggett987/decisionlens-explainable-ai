@@ -1,3 +1,17 @@
+// Global MutationObserver to catch display:none on #aiAnalysisCard
+document.addEventListener("DOMContentLoaded", () => {
+  const card = document.getElementById("aiAnalysisCard");
+  if (card) {
+    new MutationObserver((mutations) => {
+      mutations.forEach(m => {
+        if (m.attributeName === 'style' && card.style.display === 'none') {
+          console.warn('GLOBAL: AI card display set to none by something:', m, new Error().stack);
+        }
+      });
+    }).observe(card, { attributes: true, attributeFilter: ['style'] });
+  }
+});
+document.addEventListener("DOMContentLoaded", boot);
 function exportDecisionReport(scenario) {
   const report = {
     title: scenario.title,
@@ -99,7 +113,7 @@ function renderHome() {
   if (stakePill) stakePill.textContent = "Stake";
 
   currentScenario = null;
-  window.hideAIAnalysisCard?.();
+  // Do not hide AI card here; only hide when explicitly switching to home view elsewhere
 
   $("scenarioCount").textContent = `${scenarios.length}`;
 
@@ -205,6 +219,24 @@ import { showView } from "./views.js";
 //   renderScenario
 // } from "../ui/render.js"; // functions now global on window
 import { copyToClipboard, showToast } from "../ui/clipboard.js";
+
+// Ensure AI card functions are attached to window
+if (typeof window.renderAIAnalysisCard !== 'function') {
+  try {
+    window.renderAIAnalysisCard = (await import('../ui/render.js')).renderAIAnalysisCard;
+    console.log('[AI DEBUG] Attached renderAIAnalysisCard to window');
+  } catch (e) {
+    console.error('[AI DEBUG] Failed to attach renderAIAnalysisCard:', e);
+  }
+}
+if (typeof window.hideAIAnalysisCard !== 'function') {
+  try {
+    window.hideAIAnalysisCard = (await import('../ui/render.js')).hideAIAnalysisCard;
+    console.log('[AI DEBUG] Attached hideAIAnalysisCard to window');
+  } catch (e) {
+    console.error('[AI DEBUG] Failed to attach hideAIAnalysisCard:', e);
+  }
+}
 // Use window references for AI service functions, with fallback
 const toggleAI = typeof window.toggleAI === 'function' ? window.toggleAI : () => ({ isEnabled: false });
 const processScenario = typeof window.processScenario === 'function' ? window.processScenario : async () => {};
@@ -375,7 +407,7 @@ function renderHome() {
   if (stakePill) stakePill.textContent = "Stake";
 
   currentScenario = null;
-  window.hideAIAnalysisCard?.();
+  // Only hide AI card if not in walkthrough view (handled elsewhere)
 
   $("scenarioCount").textContent = `${scenarios.length}`;
 
@@ -671,7 +703,7 @@ function renderWalkthrough(scenarioId, startStep = 1) {
   sel.value = sc.id;
   sel.onchange = () => goTo(`#/scenario/${sel.value}/step/${startStep}`);
 
-  renderScenario(sc);
+  window.renderScenario(sc);
   logDecision(sc, startStep);  // Audit log entry
   renderScoreBars(sc);
   renderScoreRadarChart(sc);
@@ -757,33 +789,42 @@ function wireHeaderButtons() {
   }
 
   const aiToggleBtn = $("aiToggleBtn");
-  if (aiToggleBtn) {
+  if (aiToggleBtn && !aiToggleBtn._aiWired) {
+    aiToggleBtn._aiWired = true;
     aiToggleBtn.addEventListener("click", async () => {
       const state = toggleAI();
-
+      // Always update the button to match AI state
       aiToggleBtn.textContent = state.isEnabled ? "AI: On" : "AI: Off";
       aiToggleBtn.classList.toggle("ai-active", state.isEnabled);
-
-      const aiStatus = $("aiStatus");
-      if (aiStatus) {
-        aiStatus.textContent = state.isEnabled ? "AI Enabled" : "AI Off";
-        aiStatus.className = state.isEnabled ? "pill ai-enabled" : "pill";
-      }
-
-      showToast(state.isEnabled ? "AI features enabled" : "AI features disabled");
-
+      // Always update the status pill using updateAIStatus
+      if (typeof window.updateAIStatus === 'function') window.updateAIStatus();
       if (state.isEnabled && currentScenario) {
         try {
           const aiResult = await processScenario(currentScenario);
-          renderAIAnalysisCard(aiResult.aiRecommendation, aiResult.aiAnalysis, currentScenario);
-          showToast("AI analysis complete");
+          console.log('[AI DEBUG] Calling renderAIAnalysisCard with:', aiResult, currentScenario);
+          if (typeof window.renderAIAnalysisCard === 'function') {
+            window.renderAIAnalysisCard(aiResult.aiRecommendation, aiResult.aiAnalysis, currentScenario);
+          } else {
+            console.error('[AI DEBUG] renderAIAnalysisCard is not a function on window');
+          }
+          showToast("AI analysis complete - check green AI card");
         } catch (err) {
           console.error("AI processing error:", err);
-          hideAIAnalysisCard();
-          showToast("AI processing failed");
+          if (typeof window.hideAIAnalysisCard === 'function') {
+            console.warn('[AI DEBUG] Hiding AI card due to error');
+            window.hideAIAnalysisCard();
+          }
+          aiToggleBtn.textContent = "AI: Off";
+          aiToggleBtn.classList.remove("ai-active");
+          if (typeof window.updateAIStatus === 'function') window.updateAIStatus();
+          showToast(`AI failed: ${err.message}`);
         }
-      } else {
-        hideAIAnalysisCard();
+      } else if (!state.isEnabled) {
+        if (typeof window.hideAIAnalysisCard === 'function') {
+          console.warn('[AI DEBUG] Hiding AI card because AI is disabled');
+          window.hideAIAnalysisCard();
+        }
+        showToast("AI features disabled");
       }
     });
   }
