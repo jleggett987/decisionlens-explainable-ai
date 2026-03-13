@@ -516,7 +516,7 @@ function renderStepper() {
   stepCopy.textContent = WORKFLOW[workflowStep].copy;
 
   backBtn.disabled = workflowStep === 0;
-  nextBtn.disabled = workflowStep === WORKFLOW.length - 1;
+  nextBtn.disabled = false; // Always enable, but change behavior on last step
   nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Decision Complete" : "Continue";
 }
 
@@ -540,7 +540,15 @@ function wireWorkflowUI() {
   });
 
   backBtn.addEventListener("click", () => setWorkflowStep(workflowStep - 1));
-  nextBtn.addEventListener("click", () => setWorkflowStep(workflowStep + 1));
+  nextBtn.addEventListener("click", () => {
+    if (workflowStep === WORKFLOW.length - 1) {
+      // On last step, scroll to top and show completion message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast("Decision review complete!");
+    } else {
+      setWorkflowStep(workflowStep + 1);
+    }
+  });
 }
 let scoreRadarChart = null;
 
