@@ -1,6 +1,8 @@
-import { goTo, getRoute, onRouteChange } from '../router.js';
-import { showView } from '../views.js';
-import { showToast } from '../../ui/clipboard.js';
+// Load scenarios from global variable set by data/scenarios.js
+const scenarios = window.DECISIONLENS_SCENARIOS || [];
+import { goTo, getRoute, onRouteChange } from './router.js';
+import { showView } from './views.js';
+import { showToast } from '../ui/clipboard.js';
 // Simple DOM selector utility (throws if not found)
 const $ = (id) => {
   const el = document.getElementById(id);

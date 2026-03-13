@@ -1,3 +1,5 @@
+// Load scenarios from global variable set by data/scenarios.js
+const scenarios = window.DECISIONLENS_SCENARIOS || [];
 // ai-service.js
 // Main AI service for DecisionLens - integrates scoring, explanation, and data processing
 
