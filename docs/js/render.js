@@ -1,3 +1,21 @@
+// Render the Decision Summary Panel (enterprise style)
+function renderDecisionSummaryPanel(recommendation) {
+  const panel = document.getElementById('decisionSummaryPanel');
+  if (!panel) return;
+  if (!recommendation || !recommendation.recommendedOptionId) {
+    panel.style.display = 'none';
+    return;
+  }
+  // Emphasize recommended option, confidence secondary
+  document.getElementById('summaryRecOption').textContent = recommendation.recommendedOptionName || `Option ${recommendation.recommendedOptionId}`;
+  document.getElementById('summaryRecConfidence').textContent =
+    (typeof recommendation.confidence === 'number' && !isNaN(recommendation.confidence))
+      ? `${Math.round(recommendation.confidence * 100)}%`
+      : (recommendation.confidence || '');
+  document.getElementById('summaryRecReason').textContent = recommendation.primaryReason || '';
+  document.getElementById('summaryRecTradeoff').textContent = recommendation.keyTradeoff || '';
+  panel.style.display = '';
+}
 // render.js
 
 const $ = (id) => {
@@ -17,22 +35,9 @@ function escapeHtml(s) {
 }
 
 window.renderScenario = function(sc) {
-  const banner = document.getElementById("decisionBanner");
-
-if (sc?.recommendation) {
-  banner.classList.add('print-report');
-  banner.style.display = "";
-  document.getElementById("decisionBannerTitle").textContent =
-    `Recommended: Option ${sc.recommendation.recommendedOptionId}`;
-
-  document.getElementById("decisionBannerReason").textContent =
-    sc.recommendation.primaryReason;
-
-  document.getElementById("decisionBannerConfidence").textContent =
-    `Confidence: ${sc.recommendation.confidence}`;
-} else {
-  banner.style.display = "none";
-}
+  // Render Decision Summary Panel at the top
+  renderDecisionSummaryPanel(sc?.recommendation);
+  // ...existing code for decisionBanner remains...
   
   // Start guided flow unselected each time a scenario loads
   window.selectedOptionId = null;
