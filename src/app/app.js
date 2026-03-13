@@ -544,7 +544,7 @@ function wireWorkflowUI() {
     if (workflowStep === WORKFLOW.length - 1) {
       // On last step, scroll to top and show completion message
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast("Decision review complete!");
+      showToast("Decision review complete! Use 'Export report' to save your analysis.");
     } else {
       setWorkflowStep(workflowStep + 1);
     }
