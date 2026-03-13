@@ -1,3 +1,6 @@
+  <!-- Global feedback and error containers for accessibility -->
+  <div id="globalFeedback" class="card" style="display:none; margin-bottom:14px; background:#fffbe6; color:#856404; border:1px solid #ffeeba;" aria-live="polite" role="status"></div>
+  <div id="globalError" class="card" style="display:none; margin-bottom:14px; background:#ffeaea; color:#a94442; border:1px solid #f5c6cb;" aria-live="assertive" role="alert"></div>
 <!doctype html>
 <html lang="en">
 <head>
@@ -180,18 +183,19 @@ h1 {
       <p class="sub">Read-only demo for product conversations: options, constraints, tradeoffs, and a defensible recommendation.</p>
       <nav class="bar" aria-label="Main navigation">
         <label class="small" for="scenarioSelect"><b>Scenario</b></label>
-        <select id="scenarioSelect" aria-describedby="scenarioSelectDesc">
+        <select id="scenarioSelect" aria-describedby="scenarioSelectDesc" title="Choose a scenario to explore a real-world decision walkthrough. A scenario is a sample decision case.">
           <option value="">Select a scenario</option>
         </select>
-        <span class="pill" id="stepPill" aria-live="polite">Step 1 of 5</span>
-        <span class="pill" id="domainPill">Domain</span>
-        <span class="pill" id="stakePill">Stake</span>
-        <button class="btn" id="homeBtn" type="button" aria-label="Return to home page">Home</button>
-        <button class="btn" id="copySummaryBtn" type="button" aria-label="Copy decision summary to clipboard">Copy summary</button>
-        <button class="btn" id="exportBtn" type="button" aria-label="Export decision report as JSON file">Export report</button>
-        <button class="btn" id="printBtn" type="button" aria-label="Print current report" style="display:none;">Print report</button>
-        <button class="btn" id="aiToggleBtn" type="button" aria-label="Toggle AI analysis features">AI: Off</button>
-<span class="pill" id="aiStatus" aria-live="polite">AI Off</span>
+        <span id="scenarioSelectDesc" class="small" style="display:none">A scenario is a sample decision case. Select one to begin the walkthrough.</span>
+        <span class="pill" id="stepPill" aria-live="polite" title="Shows your progress through the decision workflow steps.">Step 1 of 5</span>
+        <span class="pill" id="domainPill" title="The area or field this decision relates to.">Domain</span>
+        <span class="pill" id="stakePill" title="The main interest or value at risk in this decision.">Stake</span>
+        <button class="btn" id="homeBtn" type="button" aria-label="Return to home page" title="Go back to the welcome screen.">Home</button>
+        <button class="btn" id="copySummaryBtn" type="button" aria-label="Copy decision summary to clipboard" title="Copy a summary of the current decision to your clipboard.">Copy summary</button>
+        <button class="btn" id="exportBtn" type="button" aria-label="Export decision report as JSON file" title="Export the full decision report as a JSON file.">Export report</button>
+        <button class="btn" id="printBtn" type="button" aria-label="Print current report" style="display:none;" title="Print the current decision report.">Print report</button>
+        <button class="btn" id="aiToggleBtn" type="button" aria-label="Toggle AI analysis features" title="Enable or disable AI-generated analysis and recommendations.">AI: Off</button>
+<span class="pill" id="aiStatus" aria-live="polite" title="Shows whether AI analysis is enabled or disabled.">AI Off</span>
         <button class="btn" id="historyBtn" type="button" aria-label="View decision history">History</button>
           <!-- HISTORY VIEW -->
           <section class="card" id="viewHistory" data-view style="display:none; margin-bottom:14px" aria-labelledby="history-heading">
@@ -274,7 +278,15 @@ h1 {
 
 
       <!-- AI Analysis Card moved to top level inside #viewWalkthrough to ensure visibility -->
-      <section class="card ai-analysis-card" id="aiAnalysisCard" style="display:none; border-left: 4px solid #4CAF50; z-index: 2; margin-bottom: 14px;">
+      <section class="card ai-analysis-card" id="aiAnalysisCard" style="display:none; border-left: 4px solid #4CAF50; z-index: 2; margin-bottom: 14px;" title="AI-generated analysis and recommendations for this decision.">
+        <div id="aiLoadingSpinner" class="spinner" style="display:none; margin-bottom:10px;" aria-label="AI analysis loading"></div>
+        <div id="aiErrorMsg" class="muted" style="display:none; color:#a94442; margin-bottom:10px;" aria-live="assertive"></div>
+            <!-- Helper text for first-time users if no scenario is selected -->
+            <div id="firstTimeHelper" class="card" style="margin-bottom:14px; display:none;">
+              <div class="muted">
+                <b>Welcome!</b> To get started, select a scenario from the dropdown above. Each scenario is a sample decision case that will walk you through the process step by step.
+              </div>
+            </div>
         <div class="recTitle">
           <strong>AI Analysis</strong>
           <span class="badge" style="background:#4CAF50">AI</span>
