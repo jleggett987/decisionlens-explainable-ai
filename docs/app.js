@@ -51,6 +51,22 @@ const WORKFLOW = [
   }
 ];
 
+const VALUE_SCORE_KEY_MAP = {
+  "Fraud Prevention": "fraudPrevention",
+  "Patient Safety": "fraudPrevention",
+  "Harm Reduction": "fraudPrevention",
+
+  "User Access & Fairness": "fairness",
+  "Fair Access": "fairness",
+  "Fairness & Due Process": "fairness",
+
+  "Trust & Transparency": "trust",
+  "Trust & Legibility": "trust",
+
+  "Operational Efficiency": "efficiency",
+  "Operational Flow": "efficiency"
+};
+
 let workflowStep = 0;
 let currentScenario = null;
 let workflowUIWired = false;
@@ -337,7 +353,7 @@ function renderWalkthrough(scenarioId, startStep = 1) {
 
   renderScenario(sc);
   renderScoreBars(sc);
-
+  renderScoreRadarChart(sc);
   const recRow = (sc.recommendation?.scoreTable || []).find(
     (r) => r.optionId === sc.recommendation?.recommendedOptionId
   );
@@ -507,7 +523,95 @@ function wireWorkflowUI() {
   backBtn.addEventListener("click", () => setWorkflowStep(workflowStep - 1));
   nextBtn.addEventListener("click", () => setWorkflowStep(workflowStep + 1));
 }
+let scoreRadarChart = null;
 
+function renderScoreRadarChart(sc) {
+  const canvas = document.getElementById("scoreRadarChart");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const rec = sc.recommendation || {};
+  const rows = Array.isArray(rec.scoreTable) ? rec.scoreTable : [];
+  if (!rows.length || !Array.isArray(sc.values) || !sc.values.length) {
+    if (scoreRadarChart) {
+      scoreRadarChart.destroy();
+      scoreRadarChart = null;
+    }
+    return;
+  }
+
+  const labels = sc.values.map(v => v.name);
+
+  const datasets = rows.map((row, idx) => {
+    const data = sc.values.map(v => {
+      const key = VALUE_SCORE_KEY_MAP[v.name];
+      return key ? (row[key] ?? 0) : 0;
+    });
+
+    const isRecommended = row.optionId === rec.recommendedOptionId;
+
+    return {
+      label: `Option ${row.optionId}`,
+      data,
+      fill: true,
+      borderWidth: isRecommended ? 3 : 2,
+      backgroundColor: isRecommended
+        ? "rgba(59,178,115,0.18)"
+        : "rgba(120,150,255,0.12)",
+      borderColor: isRecommended
+        ? "rgba(59,178,115,1)"
+        : "rgba(120,150,255,0.95)",
+      pointBackgroundColor: isRecommended
+        ? "rgba(59,178,115,1)"
+        : "rgba(120,150,255,0.95)",
+      pointRadius: 3
+    };
+  });
+
+  if (scoreRadarChart) {
+    scoreRadarChart.destroy();
+  }
+
+  scoreRadarChart = new Chart(canvas, {
+    type: "radar",
+    data: {
+      labels,
+      datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top"
+        },
+        tooltip: {
+          enabled: true
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: {
+            stepSize: 20,
+            backdropColor: "transparent"
+          },
+          grid: {
+            color: "rgba(0,0,0,0.08)"
+          },
+          angleLines: {
+            color: "rgba(0,0,0,0.08)"
+          },
+          pointLabels: {
+            font: {
+              size: 12
+            }
+          }
+        }
+      }
+    }
+  });
+}
 function renderScoreBars(sc) {
   const el = $("scoreBars");
   if (!el) return;
@@ -537,8 +641,8 @@ function renderScoreBars(sc) {
           </div>
           <div><b>${r.overall ?? "—"}</b></div>
         </div>
-        <div style="height:10px; border-radius:999px; overflow:hidden; background: rgba(0,0,0,0.08); margin-top:6px">
-          <div style="height:100%; width:${pct}%; background: rgba(120,150,255,0.85)"></div>
+        <div style="height:12px; border-radius:999px; overflow:hidden; background: rgba(0,0,0,0.08); margin-top:6px">
+          <div style="height:100%; width:${pct}%; background:${isRec ? "#3bb273" : "rgba(120,150,255,0.85)"}"></div>
         </div>
       </div>
     `;

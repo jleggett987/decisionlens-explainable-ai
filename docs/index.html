@@ -231,7 +231,13 @@
 
         <section class="card" data-pane="score">
           <h2>Score breakdown</h2>
+
+          <div style="margin-bottom:16px;">
+            <canvas id="scoreRadarChart" height="220"></canvas>
+          </div>
+
           <div id="scoreBars" style="margin: 8px 0 12px;"></div>
+          
           <table>
             <thead id="scoreHead"></thead>
             <tbody id="scoreTable"></tbody>
@@ -255,7 +261,7 @@
   <footer>
     DecisionLens is a decision reasoning demo: explainability, constraints, tradeoffs, and human impact — not automation.
   </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="scenarios.js"></script>
   <script type="module" src="app.js"></script>
 
