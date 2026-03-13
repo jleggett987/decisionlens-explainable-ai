@@ -307,12 +307,27 @@
     DecisionLens demonstrates explainable decision intelligence: transparent reasoning, ethical constraints, and human-centered outcomes.
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="../src/data/scenarios.js"></script>
-  <script src="../src/engine/ai-service.js"></script>
-  <script src="../src/engine/data-processor.js"></script>
-  <script src="../src/engine/scoring-engine.js"></script>
-  <script src="../src/engine/explanation-generator.js"></script>
-  <script type="module" src="../src/app/app.js"></script>
+  <script>
+    // Dual script loading for local and GitHub Pages
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const scriptPaths = [
+      isLocal ? '../src/data/scenarios.js' : 'src/data/scenarios.js',
+      isLocal ? '../src/engine/ai-service.js' : 'src/engine/ai-service.js',
+      isLocal ? '../src/engine/data-processor.js' : 'src/engine/data-processor.js',
+      isLocal ? '../src/engine/scoring-engine.js' : 'src/engine/scoring-engine.js',
+      isLocal ? '../src/engine/explanation-generator.js' : 'src/engine/explanation-generator.js',
+    ];
+    scriptPaths.forEach(path => {
+      const s = document.createElement('script');
+      s.src = path;
+      document.body.appendChild(s);
+    });
+    // Module script for app.js
+    const appScript = document.createElement('script');
+    appScript.type = 'module';
+    appScript.src = isLocal ? '../src/app/app.js' : 'src/app/app.js';
+    document.body.appendChild(appScript);
+  </script>
 
 </body>
 </html>
