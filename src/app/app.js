@@ -1,4 +1,14 @@
+// Simple DOM selector utility
+function $(id) {
+  return document.getElementById(id);
+}
 // Global MutationObserver to catch display:none on #aiAnalysisCard
+const $ = (id) => {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing element #${id}`);
+  return el;
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const card = document.getElementById("aiAnalysisCard");
   if (card) {
