@@ -433,6 +433,7 @@ DecisionLens is designed with accessibility and inclusive usability in mind, inc
 • accessible heading structure  
 • chart and visualization labeling  
 • visible focus states
+
 # Author
 
 Jason Leggett  

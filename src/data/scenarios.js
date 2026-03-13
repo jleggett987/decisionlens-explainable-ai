@@ -1,34 +1,6 @@
 // scenarios.js
 // Read-only scenario data. Add more scenarios by copying the object structure.
-
-const VALUE_SCORE_KEY_MAP = {
-  "Fraud Prevention": "fraudPrevention",
-  "Patient Safety": "fraudPrevention", // reused column
-  "Harm Reduction": "fraudPrevention",
-
-  "User Access & Fairness": "fairness",
-  "Fair Access": "fairness",
-  "Fairness & Due Process": "fairness",
-
-  "Trust & Transparency": "trust",
-  "Trust & Legibility": "trust",
-
-  "Operational Efficiency": "efficiency",
-  "Operational Flow": "efficiency",
-
-  "Risk Exposure": "fraudPrevention",
-  "Regulatory Compliance": "fairness",
-  "Public Trust": "trust",
-  "Innovation Velocity": "efficiency",
-  
-  // New mappings for AI governance scenario
-  "Business Value": "efficiency",
-  "Explainability": "trust",
-  "Governance & Compliance": "fairness",
-  "Accountability": "trust"
-};
-
-window.VALUE_SCORE_KEY_MAP = VALUE_SCORE_KEY_MAP;
+// VALUE_SCORE_KEY_MAP now centralized in src/config.js
 
 window.DECISIONLENS_SCENARIOS = [
   {
@@ -599,10 +571,10 @@ window.DECISIONLENS_SCENARIOS = [
         "Hard governance constraint satisfied via human-in-loop and documentation.",
         "Strong accountability constraint met through limited deployment scope."
       ],
-        scoreTable: [
-{ optionId: "A", efficiency: 90, fairness: 40, trust: 35, trust: 45, overall: 60 },
-{ optionId: "B", efficiency: 30, fairness: 85, trust: 90, trust: 85, overall: 72 },
-{ optionId: "C", efficiency: 70, fairness: 80, trust: 85, trust: 80, overall: 78 }
+      scoreTable: [
+        { optionId: "A", efficiency: 90, fairness: 40, trust: 35, accountability: 45, overall: 60 },
+        { optionId: "B", efficiency: 30, fairness: 85, trust: 90, accountability: 85, overall: 72 },
+        { optionId: "C", efficiency: 70, fairness: 80, trust: 85, accountability: 80, overall: 78 }
       ],
       explanation:
         "Immediate full deployment risks regulatory exposure and unexplainable harm despite strong aggregate performance. Delay forfeits value. Limited deployment is recommended as it delivers benefits while embedding governance from day one. Human oversight and constrained scope create a defensible path that builds trust and enables controlled learning.",
