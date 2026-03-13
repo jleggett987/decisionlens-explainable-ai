@@ -22,42 +22,52 @@ function escapeHtml(s) {
 
 export function renderScenario(sc) {
   const banner = document.getElementById("decisionBanner");
+  if (banner) {
+    if (sc?.recommendation) {
+      banner.style.display = "";
+      const bannerTitle = document.getElementById("decisionBannerTitle");
+      if (bannerTitle) bannerTitle.textContent = `Recommended: Option ${sc.recommendation.recommendedOptionId}`;
+      const bannerReason = document.getElementById("decisionBannerReason");
+      if (bannerReason) bannerReason.textContent = sc.recommendation.primaryReason;
+      const bannerConfidence = document.getElementById("decisionBannerConfidence");
+      if (bannerConfidence) bannerConfidence.textContent = `Confidence: ${sc.recommendation.confidence}`;
+    } else {
+      banner.style.display = "none";
+    }
+  }
 
-if (sc?.recommendation) {
-  banner.style.display = "";
-
-  document.getElementById("decisionBannerTitle").textContent =
-    `Recommended: Option ${sc.recommendation.recommendedOptionId}`;
-
-  document.getElementById("decisionBannerReason").textContent =
-    sc.recommendation.primaryReason;
-
-  document.getElementById("decisionBannerConfidence").textContent =
-    `Confidence: ${sc.recommendation.confidence}`;
-} else {
-  banner.style.display = "none";
-}
-  
   // Start guided flow unselected each time a scenario loads
   selectedOptionId = null;
 
   // Header pills + prompt
-  $("domainPill").textContent = `Domain: ${sc.domain}`;
-  $("stakePill").textContent = `Stake: ${sc.stakeLevel}`;
-  $("prompt").textContent = sc.prompt;
+  const domainPill = $("domainPill");
+  if (domainPill) domainPill.textContent = `Domain: ${sc.domain}`;
+  const stakePill = $("stakePill");
+  if (stakePill) stakePill.textContent = `Stake: ${sc.stakeLevel}`;
+  const prompt = $("prompt");
+  if (prompt) prompt.textContent = sc.prompt;
 
   // Recommendation card content (will be hidden until option selected)
-  $("recTitle").textContent = `Recommendation: Option ${sc.recommendation.recommendedOptionId}`;
-  $("confidenceBadge").textContent = `Confidence: ${sc.recommendation.confidence}`;
-  $("primaryReason").textContent = `Primary reason: ${sc.recommendation.primaryReason}`;
-  $("keyTradeoff").textContent = `Key tradeoff: ${sc.recommendation.keyTradeoff}`;
+  const recTitle = $("recTitle");
+  if (recTitle) recTitle.textContent = `Recommendation: Option ${sc.recommendation.recommendedOptionId}`;
+  const confidenceBadge = $("confidenceBadge");
+  if (confidenceBadge) confidenceBadge.textContent = `Confidence: ${sc.recommendation.confidence}`;
+  const primaryReason = $("primaryReason");
+  if (primaryReason) primaryReason.textContent = `Primary reason: ${sc.recommendation.primaryReason}`;
+  const keyTradeoff = $("keyTradeoff");
+  if (keyTradeoff) keyTradeoff.textContent = `Key tradeoff: ${sc.recommendation.keyTradeoff}`;
 
-  $("constraintCheck").innerHTML = sc.recommendation.constraintCheck
-    .map(x => `<li>${escapeHtml(x)}</li>`)
-    .join("");
+  const constraintCheck = $("constraintCheck");
+  if (constraintCheck) {
+    constraintCheck.innerHTML = sc.recommendation.constraintCheck
+      .map(x => `<li>${escapeHtml(x)}</li>`)
+      .join("");
+  }
 
   // Render OPTIONS (initially unselected)
-  $("options").innerHTML = sc.options.map(o => {
+  const options = $("options");
+  if (options) {
+    options.innerHTML = sc.options.map(o => {
     const isSelected = o.id === selectedOptionId; // will be false initially
     return `
       <div class="opt" data-option="${escapeHtml(o.id)}"
