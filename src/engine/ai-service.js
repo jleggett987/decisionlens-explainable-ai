@@ -195,7 +195,8 @@ window.getAISummary = function(aiResult) {
  * Toggle AI processing on/off
  */
 window.toggleAI = function() {
-  return setAIEnabled(!AI_STATE.isEnabled);
+  setAIEnabled(!AI_STATE.isEnabled);
+  return getAIState();
 }
 
 /**

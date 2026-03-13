@@ -7,10 +7,10 @@ import {
   renderAIAnalysisCard
 } from "../ui/render.js";
 import { copyToClipboard, showToast } from "../ui/clipboard.js";
-// Use window references for AI service functions
-const toggleAI = window.toggleAI;
-const processScenario = window.processScenario;
-const updateAIStatus = window.updateAIStatus;
+// Use window references for AI service functions, with fallback
+const toggleAI = typeof window.toggleAI === 'function' ? window.toggleAI : () => ({ isEnabled: false });
+const processScenario = typeof window.processScenario === 'function' ? window.processScenario : async () => {};
+const updateAIStatus = typeof window.updateAIStatus === 'function' ? window.updateAIStatus : () => {};
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
