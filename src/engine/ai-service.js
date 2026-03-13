@@ -195,8 +195,15 @@ window.getAISummary = function(aiResult) {
  * Toggle AI processing on/off
  */
 window.toggleAI = function() {
-  setAIEnabled(!AI_STATE.isEnabled);
-  return getAIState();
+  if (typeof window.setAIEnabled === 'function' && typeof window.getAIState === 'function') {
+    window.setAIEnabled(!AI_STATE.isEnabled);
+    return window.getAIState();
+  } else {
+    AI_STATE.isEnabled = !AI_STATE.isEnabled;
+    window.updateAIStatus && window.updateAIStatus();
+    return { ...AI_STATE };
+  }
+};
 }
 
 /**
