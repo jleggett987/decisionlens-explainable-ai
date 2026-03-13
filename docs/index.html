@@ -64,8 +64,12 @@
     border-radius: 10px;
     cursor: pointer;
     font-size: 13px;
+    color: #111;
     }
-    .btn:active { transform: translateY(1px); }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .spinner {
       display: inline-block;
       width: 16px;
@@ -155,7 +159,7 @@
     <section id="viewWalkthrough" data-view style="display:none;" aria-labelledby="workflow-heading">
       <section class="card" style="margin-bottom:14px">
         <h2 id="workflow-heading">Decision Workflow</h2>
-        <nav id="stepper" class="kvs" aria-label="Workflow steps"></nav>
+        <div id="stepper" class="kvs" aria-label="Workflow steps"></div>
         <p class="muted" id="stepCopy" style="margin:10px 0 0" aria-live="polite"></p>
         <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;" role="group" aria-label="Workflow navigation">
           <button class="btn" id="backStepBtn" type="button" aria-label="Go to previous step">Back</button>
