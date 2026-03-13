@@ -8,7 +8,7 @@
  * @param {number} max - Maximum value in the dataset
  * @returns {number} Normalized value (0-100)
  */
-export function normalizeValue(value, min, max) {
+window.normalizeValue = function(value, min, max) {
   if (max === min) return 50; // Default middle value if no range
   const normalized = ((value - min) / (max - min)) * 100;
   return Math.round(Math.max(0, Math.min(100, normalized)));
@@ -21,7 +21,7 @@ export function normalizeValue(value, min, max) {
  * @param {Object} valueKeyMap - Mapping from value names to score keys
  * @returns {number} Weighted overall score (0-100)
  */
-export function calculateWeightedScore(optionScores, values, valueKeyMap = {}) {
+window.calculateWeightedScore = function(optionScores, values, valueKeyMap = {}) {
   if (!optionScores || !values || values.length === 0) return 0;
 
   let weightedSum = 0;

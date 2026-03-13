@@ -1,22 +1,15 @@
 // ai-service.js
 // Main AI service for DecisionLens - integrates scoring, explanation, and data processing
 
-import { 
-  generateOptionScores, 
-  findBestOption, 
-  calculateConfidence, 
-  analyzeTradeoffs 
-} from './scoring-engine.js';
-
-import { 
-  generateRecommendation 
-} from './explanation-generator.js';
-
-import { 
-  validateScenario, 
-  checkConstraints,
-  prepareScenarioForAI 
-} from './data-processor.js';
+// Use window references for dependencies
+const generateOptionScores = window.generateOptionScores;
+const findBestOption = window.findBestOption;
+const calculateConfidence = window.calculateConfidence;
+const analyzeTradeoffs = window.analyzeTradeoffs;
+const generateRecommendation = window.generateRecommendation;
+const validateScenario = window.validateScenario;
+const checkConstraints = window.checkConstraints;
+const prepareScenarioForAI = window.prepareScenarioForAI;
 
 // AI Service state
 const AI_STATE = {
@@ -29,7 +22,7 @@ const AI_STATE = {
 /**
  * Enables/disables AI processing
  */
-export function setAIEnabled(enabled) {
+window.setAIEnabled = function(enabled) {
   AI_STATE.isEnabled = enabled;
   updateAIStatus();
   return { ...AI_STATE };
@@ -38,7 +31,7 @@ export function setAIEnabled(enabled) {
 /**
  * Returns current AI state
  */
-export function getAIState() {
+window.getAIState = function() {
   return { ...AI_STATE };
 }
 
@@ -46,7 +39,7 @@ export function getAIState() {
  * Updates the AI status indicator in the UI
  */
 
-export function updateAIStatus() {
+window.updateAIStatus = function() {
   const statusEl = document.getElementById('aiStatus');
   if (statusEl) {
     if (AI_STATE.isProcessing) {

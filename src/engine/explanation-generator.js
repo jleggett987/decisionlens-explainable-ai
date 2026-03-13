@@ -9,7 +9,7 @@
  * @param {string} confidence - Confidence level
  * @returns {string} Primary reason text
  */
-export function generatePrimaryReason(scenario, recommendedOption, scoreTable, confidence) {
+window.generatePrimaryReason = function(scenario, recommendedOption, scoreTable, confidence) {
   if (!scenario || !recommendedOption) {
     return "Based on balanced analysis of available data.";
   }

@@ -7,7 +7,7 @@
  * @param {Object} scenario - Scenario object to validate
  * @returns {Object} Validation result with isValid flag and errors array
  */
-export function validateScenario(scenario) {
+window.validateScenario = function(scenario) {
   const errors = [];
   
   if (!scenario) {
