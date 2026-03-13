@@ -57,7 +57,8 @@ if (sc?.recommendation) {
     const isSelected = o.id === selectedOptionId; // will be false initially
     return `
       <div class="opt" data-option="${escapeHtml(o.id)}"
-           style="${isSelected ? "border:1px solid #9bb7ff; background:#f4f7ff;" : ""}">
+           style="${isSelected ? "border:2px solid var(--primary); background:var(--primary-soft); box-shadow: 0 0 0 2px rgba(59,92,204,0.2);" : ""}">  
+
         <div class="top">
           <b>Option ${escapeHtml(o.id)}: ${escapeHtml(o.name)}</b>
           <span class="badge">${escapeHtml(o.reversibility)} • ${escapeHtml(o.timeHorizon)}</span>
@@ -183,7 +184,8 @@ function renderSelectedOptionHighlight(sc) {
   $("options").innerHTML = sc.options.map(o => {
     const isSelected = o.id === selectedOptionId;
     return `
-      <div class="opt" data-option="${escapeHtml(o.id)}" style="${isSelected ? "border:1px solid #9bb7ff; background:#f4f7ff;" : ""}">
+      <div class="opt" data-option="${escapeHtml(o.id)}" style="${isSelected ? "border:2px solid var(--primary); background:var(--primary-soft); box-shadow: 0 0 0 2px rgba(59,92,204,0.2);" : ""}">
+
         <div class="top">
           <b>Option ${escapeHtml(o.id)}: ${escapeHtml(o.name)}</b>
           <span class="badge">${escapeHtml(o.reversibility)} • ${escapeHtml(o.timeHorizon)}</span>

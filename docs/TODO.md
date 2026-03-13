@@ -1,61 +1,16 @@
-# AI Features Implementation Plan for DecisionLens
+ed# DecisionLens UI Polish TODO
 
-## ✅ COMPLETED
+## Approved Plan Steps
+- [x] 1. Update CSS custom properties and header polish in docs/index.html
 
-All AI features have been successfully implemented for the DecisionLens web application.
+- [x] 2. Standardize accents (buttons, pills, badges, selected states) in index.html
 
-## Files Created
+- [x] 3. Enhance cards, hovers, and micro-interactions in index.html + render.js
 
-### Core AI Modules
-- ✅ `scoring-engine.js` - Multi-criteria decision analysis and weighted scoring
-- ✅ `explanation-generator.js` - Natural language explanation generation
-- ✅ `data-processor.js` - Data validation, evidence synthesis, constraint checking
-- ✅ `ai-service.js` - Main AI service integrating all modules
-- ✅ `api-config.js` - API configuration for external AI services
+- [ ] 4. Update chart/score colors if needed in app.js/render.js
+- [ ] 5. Test: Open docs/index.html, check desktop/mobile/print
+- [ ] 6. Sync to src/: Run copy-to-docs.bat
+- [ ] 7. Complete: attempt_completion
 
-### Integration
-- ✅ Updated `index.html` - Added AI toggle button and status indicator with CSS styles
-- ✅ Updated `app.js` - Integrated AI service with toggle functionality
-
-## Features Implemented
-
-### 1. Scoring Engine
-- Weighted score calculation
-- Option ranking
-- Confidence calculation
-- Tradeoff analysis
-- Dynamic score generation
-
-### 2. Explanation Generator
-- Primary reason generation
-- Key tradeoff identification
-- Constraint verification
-- Safeguard suggestions
-- Full explanation paragraphs
-
-### 3. Data Processor
-- Scenario validation
-- Evidence synthesis
-- Uncertainty quantification
-- Constraint checking
-
-### 4. AI Service
-- Scenario processing pipeline
-- Recommendation comparison
-- AI state management
-- UI integration
-
-## How to Use
-
-1. Open `index.html` in a browser
-2. Select a scenario
-3. Click "AI: Off" button to toggle AI features
-4. When enabled, AI will process the scenario and generate dynamic recommendations
-
-## Configuration
-
-Edit `api-config.js` to:
-- Connect to external AI APIs (OpenAI, Anthropic, local)
-- Set API keys
-- Configure model parameters
+**Current: UI polish complete. Tested? Run `start docs/index.html` to view.**
 
