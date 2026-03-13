@@ -7,7 +7,10 @@ import {
   renderAIAnalysisCard
 } from "../ui/render.js";
 import { copyToClipboard, showToast } from "../ui/clipboard.js";
-import { toggleAI, processScenario, updateAIStatus } from "../engine/ai-service.js";
+// Use window references for AI service functions
+const toggleAI = window.toggleAI;
+const processScenario = window.processScenario;
+const updateAIStatus = window.updateAIStatus;
 
 const scenarios = window.DECISIONLENS_SCENARIOS || [];
 const $ = (id) => document.getElementById(id);
