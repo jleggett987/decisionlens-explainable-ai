@@ -61,7 +61,7 @@ window.updateAIStatus = function() {
  * @param {Object} scenario - The scenario to process
  * @returns {Promise<Object>} Complete processed scenario with AI recommendations
  */
-export async function processScenario(scenario) {
+window.processScenario = async function(scenario) {
   if (!scenario) {
     throw new Error('Scenario is required');
   }
@@ -133,7 +133,7 @@ export async function processScenario(scenario) {
  * @param {Object} aiResult - The AI processed result
  * @returns {Object} Comparison analysis
  */
-export function compareRecommendations(scenario, aiResult) {
+window.compareRecommendations = function(scenario, aiResult) {
   if (!scenario?.recommendation || !aiResult?.aiRecommendation) {
     return { comparable: false };
   }
@@ -163,7 +163,7 @@ export function compareRecommendations(scenario, aiResult) {
  * @param {Object} aiResult - The AI processed result
  * @returns {string} Human-readable summary
  */
-export function getAISummary(aiResult) {
+window.getAISummary = function(aiResult) {
   if (!aiResult || !aiResult.aiAnalysis) {
     return "No AI analysis available.";
   }
@@ -194,14 +194,14 @@ export function getAISummary(aiResult) {
 /**
  * Toggle AI processing on/off
  */
-export function toggleAI() {
+window.toggleAI = function() {
   return setAIEnabled(!AI_STATE.isEnabled);
 }
 
 /**
  * Initialize AI service
  */
-export function initAIService() {
+window.initAIService = function() {
   // Check for URL parameter to enable AI by default
   const urlParams = new URLSearchParams(window.location.search);
   const aiParam = urlParams.get('ai');
@@ -213,14 +213,5 @@ export function initAIService() {
   return getAIState();
 }
 
-// Export all functions
-export default {
-  setAIEnabled,
-  getAIState,
-  processScenario,
-  compareRecommendations,
-  getAISummary,
-  toggleAI,
-  initAIService,
-  updateAIStatus
-};
+// Attach all functions to window for script compatibility
+// (No default export)
