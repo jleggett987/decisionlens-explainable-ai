@@ -517,7 +517,7 @@ function renderStepper() {
 
   backBtn.disabled = workflowStep === 0;
   nextBtn.disabled = workflowStep === WORKFLOW.length - 1;
-  nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Review full decision" : "Continue";
+  nextBtn.textContent = workflowStep === WORKFLOW.length - 1 ? "Decision Complete" : "Continue";
 }
 
 function wireWorkflowUI() {
