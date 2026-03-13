@@ -127,8 +127,19 @@
         <button class="btn" id="homeBtn" type="button" aria-label="Return to home page">Home</button>
         <button class="btn" id="copySummaryBtn" type="button" aria-label="Copy decision summary to clipboard">Copy summary</button>
         <button class="btn" id="exportBtn" type="button" aria-label="Export decision report as JSON file">Export report</button>
+        <button class="btn" id="printBtn" type="button" aria-label="Print current report" style="display:none;">Print report</button>
         <button class="btn" id="aiToggleBtn" type="button" aria-label="Toggle AI analysis features">AI: Off</button>
-        <span class="pill" id="aiStatus" aria-live="polite">AI Off</span>
+<span class="pill" id="aiStatus" aria-live="polite">AI Off</span>
+        <button class="btn" id="historyBtn" type="button" aria-label="View decision history">History</button>
+          <!-- HISTORY VIEW -->
+          <section class="card" id="viewHistory" data-view style="display:none; margin-bottom:14px" aria-labelledby="history-heading">
+            <h2 id="history-heading">Decision History</h2>
+            <div style="margin-bottom:10px;">
+              <button class="btn" id="backFromHistoryBtn" type="button" aria-label="Back to previous view">Back</button>
+              <button class="btn" id="exportHistoryBtn" type="button" aria-label="Export user-readable history log">Export History</button>
+            </div>
+            <div id="historyList"></div>
+          </section>
       </nav>
     </div>
   </header>
@@ -299,6 +310,16 @@
 
     </section>
 
+    <!-- HISTORY VIEW -->
+    <section id="viewHistory" data-view style="display:none;">
+      <div class="card">
+        <h2>Decision History</h2>
+        <p class="muted">Recent decisions and walkthroughs. Click to resume.</p>
+        <div id="historyList"></div>
+        <button class="btn" id="clearHistoryBtn" type="button" style="margin-top:12px;">Clear All History</button>
+      </div>
+    </section>
+
     <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">Copied summary</div>
   </main>
 
@@ -307,9 +328,18 @@
     DecisionLens demonstrates explainable decision intelligence: transparent reasoning, ethical constraints, and human-centered outcomes.
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Print styles -->
+  <script>
+    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const printLink = document.createElement('link');
+    printLink.rel = 'stylesheet';
+    printLink.href = isLocal ? '../src/ui/print.css' : 'src/ui/print.css';
+    document.head.appendChild(printLink);
+  </script>
+
   <script>
     // Dual script loading for local and GitHub Pages
-    const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const scriptPaths = [
       isLocal ? '../src/config.js' : 'src/config.js',
       isLocal ? '../src/data/scenarios.js' : 'src/data/scenarios.js',
@@ -330,6 +360,7 @@
     appScript.src = isLocal ? '../src/app/app.js' : 'src/app/app.js';
     document.body.appendChild(appScript);
   </script>
+
 
 </body>
 </html>

@@ -8,7 +8,7 @@ const $ = (id) => {
 
 // VALUE_SCORE_KEY_MAP now centralized in src/config.js
 
-let selectedOptionId = null;
+window.selectedOptionId = null;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
@@ -16,12 +16,12 @@ function escapeHtml(s) {
   }[c]));
 }
 
-export function renderScenario(sc) {
+window.renderScenario = function(sc) {
   const banner = document.getElementById("decisionBanner");
 
 if (sc?.recommendation) {
+  banner.classList.add('print-report');
   banner.style.display = "";
-
   document.getElementById("decisionBannerTitle").textContent =
     `Recommended: Option ${sc.recommendation.recommendedOptionId}`;
 
@@ -35,7 +35,7 @@ if (sc?.recommendation) {
 }
   
   // Start guided flow unselected each time a scenario loads
-  selectedOptionId = null;
+  window.selectedOptionId = null;
 
   // Header pills + prompt
   $("domainPill").textContent = `Domain: ${sc.domain}`;
@@ -220,15 +220,16 @@ function renderScoreTable(sc, selectedOptionId) {
 
   tbody.innerHTML = sc.recommendation.scoreTable.map(r => {
     const isSelected = r.optionId === selectedOptionId;
+    const highlightClass = isSelected ? 'highlight-row' : '';
 
     const valueCells = sc.values.map(v => {
-const key = window.VALUE_SCORE_KEY_MAP[v.name];
+      const key = window.VALUE_SCORE_KEY_MAP[v.name];
       const val = key ? (r[key] ?? r[v.name.toLowerCase().replace(/\s+/g, '')] ?? 50) : 50;
       return `<td>${val}</td>`;
     }).join("");
 
     return `
-      <tr style="${isSelected ? "background:#f4f7ff; outline:1px solid #9bb7ff;" : ""}">
+      <tr class="${highlightClass}" style="${isSelected ? "background:#f4f7ff; outline:1px solid #9bb7ff;" : ""}">
         <td><b>${escapeHtml(r.optionId)}</b></td>
         ${valueCells}
         <td><b>${r.overall}</b></td>
@@ -272,15 +273,15 @@ function updateSelectionVisibility() {
   // setPaneVisible("score", hasSelection);
 }
 
-export function hideAIAnalysisCard() {
+window.hideAIAnalysisCard = function() {
   const card = document.getElementById("aiAnalysisCard");
   if (card) card.style.display = "none";
 }
 
-export function renderAIAnalysisCard(aiRecommendation, aiAnalysis, currentScenario) {
+window.renderAIAnalysisCard = function(aiRecommendation, aiAnalysis, currentScenario) {
   const card = document.getElementById("aiAnalysisCard");
   if (!card || !aiRecommendation || !aiAnalysis) {
-    hideAIAnalysisCard();
+    window.hideAIAnalysisCard();
     return;
   }
 
